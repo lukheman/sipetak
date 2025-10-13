@@ -15,7 +15,7 @@ use Livewire\Component;
 class RegistrasiPage extends Component
 {
     #[Validate('required|string|max:255')]
-    public $name;
+    public $nama;
 
     #[Validate('required|email|max:255|unique:users,email', message: 'Email wajib diisi, harus valid, dan belum terdaftar.')]
     public $email;
@@ -26,13 +26,11 @@ class RegistrasiPage extends Component
     #[Validate('nullable|string', message: 'Alamat wajib di isi')]
     public $alamat;
 
-    #[Validate('required|date|before:today')]
-    public $tanggal_lahir;
 
     #[Rule('required|string|min:4|confirmed')]
     public $password;
 
-    #[Rule('required|exists:desa,id')]
+    #[Rule('required|exists:desa,id_desa')]
     public $desa;
 
     public $password_confirmation;
@@ -53,9 +51,9 @@ class RegistrasiPage extends Component
     {
 
         return [
-            'name.required' => 'Nama wajib diisi dan maksimal 255 karakter.',
-            'name.string' => 'Nama wajib diisi dan maksimal 255 karakter.',
-            'name.max' => 'Nama wajib diisi dan maksimal 255 karakter.',
+            'nama.required' => 'Nama wajib diisi dan maksimal 255 karakter.',
+            'nama.string' => 'Nama wajib diisi dan maksimal 255 karakter.',
+            'nama.max' => 'Nama wajib diisi dan maksimal 255 karakter.',
             'email.required' => 'Email wajib diisi, harus valid, dan belum terdaftar.',
             'email.email' => 'Email wajib diisi, harus valid, dan belum terdaftar.',
             'email.max' => 'Email wajib diisi, harus valid, dan belum terdaftar.',
@@ -64,9 +62,6 @@ class RegistrasiPage extends Component
             'telepon.required' => 'Telepon wajib diisi dan harus berupa nomor Indonesia (0xxxxxxxxxx).',
             'telepon.regex' => 'Telepon harus berupa nomor Indonesia yang dimulai dari 0 dengan panjang 10 hingga 15 digit.',
             'telepon.unique' => 'Nomor telepon telah terdaftar',
-            'tanggal_lahir.required' => 'Tanggal lahir wajib diisi dan harus sebelum hari ini.',
-            'tanggal_lahir.date' => 'Tanggal lahir wajib diisi dan harus sebelum hari ini.',
-            'tanggal_lahir.before' => 'Tanggal lahir wajib diisi dan harus sebelum hari ini.',
             'desa.required' => 'Desa wajib dipilih.',
             'desa.exists' => 'Desa yang dipilih tidak valid.',
             'password.confirmed' => 'Konfirmasi password tidak sesuai dengan password yang dimasukkan.',
@@ -76,24 +71,24 @@ class RegistrasiPage extends Component
     public function updatedKecamatan($value)
     {
         $this->desaList = $value ? Desa::where('id_kecamatan', $value)->get() : collect();
+
+
     }
 
     public function register()
     {
         $this->validate();
 
-        User::create([
-            'name' => $this->name,
+        User::query()->create([
+            'nama' => $this->nama,
             'email' => $this->email,
-            'telepon' => $this->telepon,
-            'tanggal_lahir' => $this->tanggal_lahir,
-            'id_desa' => $this->desa,
-            'alamat' => $this->alamat,
-            'role' => Role::PETANI->value,
             'password' => bcrypt($this->password),
+            'telepon' => $this->telepon,
+            'id_desa' => $this->desa,
+            'role' => Role::PETANI->value,
         ]);
 
-        session()->flash('message', 'Registrasi berhasil! Silakan login.');
+        flash('Registrasi berhasil! Silakan login.');
         $this->redirectRoute('login');
     }
 

@@ -1,155 +1,256 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'SIPANEN Kolaka' }}</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ $title ?? 'SiPetak Kolaka' }}</title>
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-    <style>
-        :root {
-            --primary: #4CAF50; /* hijau padi */
-            --text-dark: #2E2E2E;
-            --text-muted: #6c757d;
-        }
+  <style>
+    :root {
+      --primary: #2e7d32;
+      --primary-dark: #1b5e20;
+      --secondary: #a5d6a7;
+      --text-dark: #1a3c34;
+      --text-muted: #4a4a4a;
+      --background: #f1f8e9;
+    }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            color: var(--text-dark);
-        }
+    * {
+      scroll-behavior: smooth;
+    }
 
-        /* Navbar */
-        .navbar {
-            background-color: white !important;
-        }
-        .navbar-brand, .nav-link {
-            color: var(--text-dark) !important;
-            font-weight: 500;
-        }
-        .nav-link.active, .nav-link:hover {
-            color: var(--primary) !important;
-        }
+    body {
+      font-family: "Poppins", sans-serif;
+      color: var(--text-dark);
+      background-color: var(--background);
+    }
 
-        /* Parallax */
-        .parallax {
-            background-image: url("{{ asset('img/hero.jpg')}}");
-            min-height: 100vh;
-            background-attachment: fixed;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-size: cover;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 0 1rem;
-        }
+    /* Navbar */
+    .navbar {
+      background-color: transparent;
+      transition: all 0.4s ease;
+      padding: 1rem 0;
+    }
 
-        .parallax h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: white;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.4);
-        }
+    .navbar.scrolled {
+      background-color: white !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
 
-        .parallax p {
-            color: white;
-            font-size: 1.1rem;
-        }
+    .navbar-brand,
+    .nav-link {
+      color: var(--text-dark) !important;
+      font-weight: 600;
+    }
 
-        /* Card */
-        .shadow-card {
-            border: none;
-            border-radius: 16px;
-            padding: 2rem;
-            background: #fff;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-            transition: all 0.3s ease;
-        }
+    .nav-link {
+      position: relative;
+      transition: color 0.3s ease;
+    }
 
-        .shadow-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 0%;
+      height: 2px;
+      background-color: var(--primary);
+      transition: width 0.3s ease;
+    }
 
-        /* Section Title */
-        h2.section-title {
-            font-weight: 600;
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            color: var(--text-dark);
-        }
+    .nav-link:hover::after,
+    .nav-link.active::after {
+      width: 100%;
+    }
 
-        .btn-primary {
-            background-color: var(--primary);
-            border: none;
-            border-radius: 8px;
-            padding: 0.75rem 1.5rem;
-            font-weight: 500;
-        }
+    .navbar-brand img {
+      height: 42px;
+      margin-right: 8px;
+    }
 
-        .btn-primary:hover {
-            background-color: #43A047;
-        }
+    /* Parallax */
+    .parallax {
+      background-image: linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
+        url("{{ asset('img/hero.jpg') }}");
+      min-height: 90vh;
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 1.5rem;
+    }
 
-        .btn-outline-primary {
-            border-color: var(--primary);
-            color: var(--primary);
-            border-radius: 8px;
-        }
+    .parallax h1 {
+      font-size: 3.2rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
 
-        .btn-outline-primary:hover {
-            background-color: var(--primary);
-            color: white;
-        }
+    .parallax p {
+      color: var(--secondary);
+      font-size: 1.25rem;
+      max-width: 650px;
+      margin: 1rem auto 0;
+    }
 
-        footer {
-            background-color: #f8f9fa;
-            color: var(--text-muted);
-        }
-    </style>
+    /* Cards */
+    .shadow-card {
+      border: none;
+      border-radius: 14px;
+      padding: 2rem;
+      background: white;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
 
+    .shadow-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Section title */
+    h2.section-title {
+      font-weight: 600;
+      font-size: 2rem;
+      margin-bottom: 1.2rem;
+      color: var(--text-dark);
+      text-align: center;
+      position: relative;
+    }
+
+    h2.section-title::after {
+      content: "";
+      width: 70px;
+      height: 4px;
+      background: var(--primary);
+      display: block;
+      margin: 0.5rem auto;
+      border-radius: 3px;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background-color: var(--primary);
+      border: none;
+      border-radius: 10px;
+      padding: 0.8rem 2rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-3px);
+      box-shadow: 0 4px 15px rgba(46, 125, 50, 0.4);
+    }
+
+    .btn-outline-primary {
+      border-color: var(--primary);
+      color: var(--primary);
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    /* Footer */
+    footer {
+      background-color: var(--primary-dark);
+      color: white;
+      padding: 2.5rem 0;
+    }
+
+    footer a {
+      color: var(--secondary);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    footer a:hover {
+      color: white;
+    }
+
+    footer p {
+      margin: 0.3rem 0;
+      font-size: 0.95rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .parallax h1 {
+        font-size: 2rem;
+      }
+      .parallax p {
+        font-size: 1rem;
+      }
+      h2.section-title {
+        font-size: 1.5rem;
+      }
+    }
+
+@stack('styles')
+  </style>
 </head>
 <body>
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">SIPANEN Kolaka</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link @if (request()->routeIs('landing'))
-    active
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">
+        SiPetak
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link @if (request()->routeIs('landing')) active @endif" href="{{ route('landing') }}">Beranda</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ route('landing') }}#about">Tentang</a></li>
+          <li class="nav-item"><a wire:navigate class="nav-link @if (request()->routeIs('login')) active @endif" href="{{ route('login') }}">Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-                    @endif" href="{{ route('landing')}}">Beranda</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ route('landing')}}#about">Tentang</a></li>
-                    <li class="nav-item"><a wire:navigate class="nav-link @if (request()->routeIs('login'))
-    active
+  <!-- Content -->
+  <main class="mt-5 pt-5">
+    {{ $slot }}
+  </main>
 
-                    @endif" href="{{ route('login')}}">Login</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+  <!-- Footer -->
+  <footer class="text-center">
+    <div class="container">
+      <p class="mb-1">&copy; {{ date('Y') }} Dinas Pertanian dan Perkebunan Kolaka. Semua Hak Dilindungi.</p>
+      <p><a href="{{ route('landing') }}#contact">Hubungi Kami</a> | <a href="{{ route('landing') }}#privacy">Kebijakan Privasi</a></p>
+    </div>
+  </footer>
 
-    <!-- Content -->
-    <main class="mt-5 pt-4">
-        {{ $slot }}
-    </main>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Footer -->
-    <footer class="py-3 text-center mt-5">
-        <small>&copy; {{ date('Y') }} Dinas Pertanian dan Perkebunan Kolaka. Semua Hak Dilindungi.</small>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Navbar scroll behavior
+    window.addEventListener("scroll", function () {
+      const navbar = document.querySelector(".navbar");
+      if (window.scrollY > 60) {
+        navbar.classList.add("scrolled");
+      } else {
+        navbar.classList.remove("scrolled");
+      }
+    });
+  </script>
 </body>
 </html>

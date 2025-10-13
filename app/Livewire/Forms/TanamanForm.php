@@ -3,6 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Models\Tanaman;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
 
@@ -11,15 +12,15 @@ class TanamanForm extends Form
     public ?Tanaman $tanaman = null;
 
     public string $nama_tanaman = '';
-    public string $jenis = '';
-    public string $musim_tanam = '';
+    public string $deskripsi = '';
+    public $gambar;
 
-  public function rules(): array
+    public function rules(): array
     {
         return [
             'nama_tanaman' => ['required', 'string', 'min:3', 'max:100'],
-            'jenis' => ['required', 'string', 'min:3', 'max:50'],
-            'musim_tanam' => ['required', 'string', 'min:3', 'max:50'],
+            'gambar' => ['nullable', 'max:2048'],
+            'deskripsi' => ['nullable', 'string']
         ];
     }
 
@@ -30,13 +31,10 @@ class TanamanForm extends Form
             'nama_tanaman.min' => 'Nama tanaman minimal 3 karakter.',
             'nama_tanaman.max' => 'Nama tanaman maksimal 100 karakter.',
 
-            'jenis.required' => 'Jenis tanaman wajib diisi.',
-            'jenis.min' => 'Jenis tanaman minimal 3 karakter.',
-            'jenis.max' => 'Jenis tanaman maksimal 50 karakter.',
+            'deskripsi.string' => 'Deskripsi hanya boleh berisi huruf atau karakter yang valid.',
 
-            'musim_tanam.required' => 'Musim tanam wajib diisi.',
-            'musim_tanam.min' => 'Musim tanam minimal 3 karakter.',
-            'musim_tanam.max' => 'Musim tanam maksimal 50 karakter.',
+            'gambar.max' => 'Ukuran gambar maksimal 2MB.',
+
         ];
     }
 
@@ -47,8 +45,8 @@ class TanamanForm extends Form
     {
         $this->tanaman = $tanaman;
         $this->nama_tanaman = $tanaman->nama_tanaman;
-        $this->jenis = $tanaman->jenis;
-        $this->musim_tanam = $tanaman->musim_tanam;
+        $this->gambar = $tanaman->gambar;
+        $this->deskripsi = $tanaman->deskripsi;
     }
 
     /**
@@ -56,7 +54,16 @@ class TanamanForm extends Form
      */
     public function store(): void
     {
-        Tanaman::create($this->validate());
+        $tanaman = Tanaman::query()->create($this->validate());
+
+        if ($this->gambar) {
+            // Store new gambar
+            $path = $this->gambar->store('tanaman', 'public');
+            $tanaman->update([
+                'gambar' => $path
+            ]);
+        }
+
         $this->reset();
     }
 
@@ -67,13 +74,27 @@ class TanamanForm extends Form
     {
         $this->validate();
 
-        if ($this->tanaman) {
+        $this->tanaman->update([
+            'nama_tanaman' => $this->nama_tanaman,
+            'deskripsi' => $this->deskripsi,
+        ]);
+
+        if ($this->gambar) {
+
+            // Delete old gambar if exists
+            if ($this->tanaman->gambar) {
+                Storage::disk('public')->delete($this->tanaman->gambar);
+            }
+
+            // Store new gambar
+            $path = $this->gambar->store('tanaman', 'public');
             $this->tanaman->update([
-                'nama_tanaman' => $this->nama_tanaman,
-                'jenis' => $this->jenis,
-                'musim_tanam' => $this->musim_tanam,
+                'gambar' => $path
             ]);
         }
+
+        $this->reset();
+
     }
 
     /**

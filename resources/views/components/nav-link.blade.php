@@ -1,12 +1,12 @@
-@props(['href', 'active' => false, 'icon' => 'fa-home'])
+@props(['href', 'active' => false, 'icon' => 'mdi-grid-large'])
 
 @php
-    $classes = $active ? 'sidebar-item active' : 'sidebar-item';
+    $classes = $active ? 'nav-item active' : 'nav-item';
 @endphp
 
 <li {{ $attributes->class([$classes]) }}>
-    <a href="{{ $href }}" class="sidebar-link">
-        <i class="bi {{ $icon }}"></i>
-        <span>{{ $slot }}</span>
-    </a>
+  <a class="nav-link" href="{{ $href }}">
+    <i class="mdi {{ $icon }} menu-icon"></i>
+    <span class="menu-title">{{ $slot }}</span>
+  </a>
 </li>

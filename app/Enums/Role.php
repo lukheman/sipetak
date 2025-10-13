@@ -6,7 +6,7 @@ enum Role: string
 {
     case ADMIN = 'Admin';
     case PETANI = 'Petani';
-    case PETUGAS = 'Petugas Lapangan';
+    case PENYULUH = 'Penyuluh';
     case KEPALADINAS = 'Kepala Dinas';
 
     public function getLabel(): ?string
@@ -19,7 +19,7 @@ enum Role: string
         return match ($this) {
             self::ADMIN => 'primary',
             self::PETANI => 'success',
-            self::PETUGAS => 'danger',
+            self::PENYULUH => 'danger',
             self::KEPALADINAS => 'warning',
             default => 'default'
         };

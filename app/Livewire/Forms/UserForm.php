@@ -3,9 +3,8 @@
 namespace App\Livewire\Forms;
 
 use App\Enums\Role;
-use App\Models\Admin;
-use App\Models\KepalaDinas;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Livewire\Form;
 
@@ -13,63 +12,123 @@ class UserForm extends Form
 {
     public $user;
 
-    public string $nama_petani = '';
+    public string $nama = '';
+
+    public string $email = '';
+
+    public string $password = '';
 
     public string $telepon = '';
 
-    public string $alamat = '';
+    public $role;
 
     public ?int $id_desa;
 
+    public $photo;
+
     protected function rules(): array
     {
-        return [
-            'nama_petani' => 'required|string|max:255',
+        $rules = [
+            'nama' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($this->user),
+            ],
+            'password' => ['nullable', 'string', 'min:4'],
             'telepon' => [
                 'required',
                 'regex:/^0[0-9]{9,14}$/',
                 'numeric'
             ],
-            'alamat' => 'required|max:255',
+            'role' => ['required'],
             'id_desa' => 'required|exists:desa,id_desa',
         ];
+
+        // Validasi file hanya jika upload baru
+        if ($this->photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+            $rules['photo'] = ['nullable', 'image', 'max:2048'];
+        }
+
+        return $rules;
     }
 
     public function messages(): array
     {
         return [
-            'nama_petani.required' => 'Mohon masukkan nama Anda (maksimal 255 karakter).',
-            'nama_petani.string' => 'Nama hanya boleh berisi huruf atau karakter yang valid.',
-            'nama_petani.max' => 'Nama maksimal 255 karakter.',
+            'nama.required' => 'Mohon masukkan nama Anda (maksimal 255 karakter).',
+            'nama.string' => 'Nama hanya boleh berisi huruf atau karakter yang valid.',
+            'nama.max' => 'Nama maksimal 255 karakter.',
 
-            'alamat.required' => 'Mohon isi alamat Anda.',
-            'alamat.max' => 'Alamat maksimal 255 karakter',
+            'email.required' => 'Mohon masukkan email Anda.',
+            'email.email' => 'Mohon masukkan email yang valid.',
+            'email.max' => 'Email maksimal 255 karakter.',
+            'email.unique' => 'Email telah terdaftar.',
+
+            'password.required' => 'Mohon masukkan kata sandi (minimal 4 karakter).',
+            'password.string' => 'Kata sandi hanya boleh berisi huruf atau karakter yang valid.',
+            'password.min' => 'Kata sandi minimal 4 karakter.',
 
             'telepon.required' => 'Mohon masukkan nomor telepon Anda.',
             'telepon.regex' => 'Nomor telepon harus format Indonesia, diawali 0, dan panjang 10–15 digit.',
             'telepon.numeric' => 'Nomor telepon hanya boleh berisi angka',
             'telepon.numeric' => 'Nomor telepon hanya boleh berisi angka',
+
             'id_desa.required' => 'Silakan pilih desa.',
             'id_desa.exists' => 'Desa yang dipilih tidak tersedia di sistem.',
+
+            'photo.image' => 'File yang diunggah harus berupa gambar (jpeg, png, bmp, gif, svg, atau webp).',
+            'photo.max' => 'Ukuran gambar maksimal 2MB.',
 
         ];
     }
 
     public function store()
     {
-        User::create($this->validate());
+        $this->validate();
+
+        User::query()->create($this->validate());
+
         $this->reset();
     }
 
     public function update()
     {
+
+
+
         $this->user->update($this->validate());
-        $this->reset();
+
+        if ($this->photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
+            // Hapus foto lama jika ada
+            if ($this->user->photo) {
+                Storage::disk('public')->delete($this->user->photo);
+            }
+
+            // Simpan foto baru
+            $path = $this->photo->store('photos', 'public');
+            $this->user->update(['photo' => $path]);
+        }
+
+        // $this->reset();
     }
 
     public function delete()
     {
         $this->user->delete();
         $this->reset();
+    }
+
+    public function fillFromModel(User $user): void
+    {
+        $this->user = $user;
+        $this->nama = $user->nama;
+        $this->telepon = $user->telepon;
+        $this->email = $user->email;
+        $this->role = $user->role;
+
+        $this->id_desa = $user->id_desa;
+        $this->photo = $user->photo;
     }
 }

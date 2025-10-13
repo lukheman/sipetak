@@ -1,15 +1,17 @@
 @php
     use \App\Enums\Role;
-    $role = auth()->user()->role;
+
+    $role = getActiveUserRole();
 @endphp
 
 <div>
 
-    @if(auth('admin')->check())
+    @if($role === Role::ADMIN)
         <livewire:dashboard.admin-dashboard />
-    @elseif(auth('kepala_dinas')->check())
+    @elseif($role === Role::KEPALADINAS)
         <livewire:dashboard.kepala-dinas-dashboard />
-    @elseif(auth('petugas')->check())
+    @elseif($role === Role::PENYULUH)
         <livewire:dashboard.petugas-dashboard />
     @endif
+
 </div>

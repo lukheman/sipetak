@@ -8,6 +8,9 @@ use App\Models\User;
 use App\Models\Petugas;
 use App\Models\HasilPanen;
 use App\Models\Tanaman;
+use Database\Seeders\PenyebabSeranganSeeder;
+use Database\Seeders\TanamanSeeder;
+use Database\Seeders\UserSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -45,8 +48,14 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        $this->call([
+            UserSeeder::class,
+            PenyebabSeranganSeeder::class,
+            TanamanSeeder::class
+        ]);
+
         // Ambil daftar desa secara acak untuk dipakai user
-        $desaIds = $desaList->pluck('id_desa');
+        // $desaIds = $desaList->pluck('id_desa');
 
         // User::factory(30)
         //     ->state(function () use ($desaIds) {
@@ -59,30 +68,15 @@ class DatabaseSeeder extends Seeder
         // Tanaman::factory(10)->create();
         // HasilPanen::factory(10)->create();
 
-        // Buat user dengan id_desa secara acak
-        Admin::query()->create([
-            'nama_admin' => 'Admin',
-            'email' => 'admin@gmail.com',
-        ]);
+        // buat User
 
-        Petugas::factory()->create([
-            'nama_petugas' => 'Petugas 1',
-            'email' => 'petugas1@gmail.com',
-            'id_kecamatan' => 1
-        ]);
 
-        Petugas::factory()->create([
-            'nama_petugas' => 'Petugas 2',
-            'email' => 'petugas2@gmail.com',
-            'id_kecamatan' => 2
-        ]);
-
-        KepalaDinas::query()->create([
-            'nama_kepala_dinas' => 'Kepala Dinas Kolaka',
-            'email' => 'kepaladinas@gmail.com',
-            'telepon' => '08225002210021',
-            'tanggal_lahir' => fake()->date()
-        ]);
+        // User::query()->create([
+        //     'nama_kepala_dinas' => 'Kepala Dinas Kolaka',
+        //     'email' => 'kepaladinas@gmail.com',
+        //     'telepon' => '08225002210021',
+        //     'tanggal_lahir' => fake()->date()
+        // ]);
 
     }
 }

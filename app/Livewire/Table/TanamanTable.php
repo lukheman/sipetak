@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Table;
 
-use App\Traits\Traits\WithModal;
+use App\Traits\WithModal;
 use App\Traits\WithNotify;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -11,14 +11,16 @@ use Livewire\Component;
 use App\Models\Tanaman;
 use App\Enums\State;
 use App\Livewire\Forms\TanamanForm;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
 #[Title('Tanaman')]
 class TanamanTable extends Component
 {
-    use WithModal;
+    use WithFileUploads;
     use WithNotify;
     use WithPagination;
+    use WithModal;
 
     public TanamanForm $form;
 
@@ -32,10 +34,7 @@ class TanamanTable extends Component
     public function tanaman() {
         return Tanaman::query()
             ->when($this->search, function ($query) {
-                $query->where('nama_tanaman', 'like', '%'.$this->search.'%')
-                ->orWhere('jenis', 'like', '%'.$this->search.'%')
-                ->orWhere('musim_tanam', 'like', '%'.$this->search.'%')
-                ;
+                $query->where('nama_tanaman', 'like', '%'.$this->search.'%') ;
             })
             ->latest()
             ->paginate(10);
@@ -53,10 +52,11 @@ class TanamanTable extends Component
 
         $tanaman = Tanaman::findOrFail($id);
 
-        $this->currentState = State::SHOW;
 
         $this->form->fillFromModel($tanaman);
         $this->openModal($this->idModal);
+
+        $this->currentState = State::SHOW;
 
     }
 

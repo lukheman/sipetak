@@ -1,58 +1,36 @@
-# SISTEM INFORMASI PELAPORAN HASIL PANEN DI DINAS PERTANIAN DAN PERKEBUNAN KOLAKA
+# Fitur umum
+- Login/logout [free]
+- Dashboard pada 4 Role [free]
+- Registrasi untuk petani [free]
+- Landing page [free]
+- Profile [free]
 
-## Fitur Umum
+# ADMIN
 
-- [ ] Login/logout ke aplikasi [free]
-- [ ] Landing page [free]
-- [ ] Dashboard pada 3 role [free]
+- CRUD Data Hama [30]
+- CRUD Data Penyakit [30]
+- Input Data penanganan [1]
+- CRUD Data Wilayah [Kecamatan dan desa] [60k]
+- CRUD Data Tanaman [30]
 
-## Fitur Khusus
-
-- [ ] Input data yang oleh petugas lapangan harus divalidasi oleh admin (validator) [100]
-- [x] Cetak laporan dalam bentuk pdf [free]
-
-## Role Admin
-
-- [x] Mengelola data petugas lapangan [free]
-- [x] Mengelola data petani [free]
-- [ ] Mengelola akun pengguna [50]
-- [ ] Validasi data yang diinput petugas [telah dihitung]
-
-### Laporan
-
-- [ ] Laporan/rekap hasil panen [50]
-- [x] Laporan data pengguna/petugas lapangan [50]
-- [x] Laporan data petani [50]
-- [ ] Laporan validasi [50]
+- Memberikan solusi penanganan serangan [1]
+- validasi laporan serangan [f]
 
 
-### Grafik
+# PETANI
 
-- [ ] Rekap dan grafik panen [70]
+- CRUD Data Serangan Hama dan Penyakit [1]
+- Informasi dan penanganan dari Penyuluh [1]
+
+# PENYULUH
+
+- Memberikan Rekomendasi solusi dan penanganan serangan [1]
+
+# KEPALA DINAS
 
 
-## Role Petugas Lapangan
+## Laporan
+- Laporan Penanganan [50]
+- Laporan serangan [50]
 
-- [x] Mengelola data petani [free]
-- [x] Mengelola data panen [30]
-- [x] Mengelola data tanaman [30]
-- [ ] Mengelola data lokasi [30]
-- [ ] Menerima status validasi [telah dihitung]
-
-## Role Kepala Dinas
-
-- [ ] melihat laporan yang telah dibuat oleh Admin [free]
-- [x] Cetak laporan dalam bentuk pdf [telah dihitung]
-
-## Rincian Harga
-
-| Keterangan                     | Harga          |
-|-------------------------------|----------------|
-| Total fitur                   | Rp   510.000   |
-| Pengerjaan dan revisi         | Rp 1.000.000   |
-| **Total Keseluruhan**         | **Rp 1.510.000** |
-
-## Catatan
-
-- Penambahan fitur **sederhana** masih bisa dimasukkan dalam revisi tanpa biaya tambahan
-- Penambahan fitur **kompleks** tikak termasuk dalam revisi dan dikenai biaya tambahan sesuai tingkat kesulitan fitur yang diminta
+- Sistem pengaduan dan konsultasi serangan hama dan penyakit [200]

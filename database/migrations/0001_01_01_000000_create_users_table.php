@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Role;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,12 +12,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('petani', function (Blueprint $table) {
-            $table->id('id_petani');
-            $table->string('nama_petani');
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama');
+            $table->string('email')->unique();
+            $table->string('password');
             $table->string('telepon');
-            $table->string('alamat');
+            $table->enum('role', Role::values())->default(Role::PETANI);
             $table->foreignId('id_desa')->constrained('desa', 'id_desa')->cascadeOnDelete();
+            $table->string('photo')->nullable();
+            $table->rememberToken();
             $table->timestamps();
         });
 

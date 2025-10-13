@@ -10,5 +10,8 @@ class Tanaman extends Model
     use HasFactory;
     protected $table = 'tanaman';
     protected $guarded = [];
-    protected $primaryKey = 'id_tanaman';
+
+    public function laporanSerangan() {
+        return $this->hasMany(LaporanSerangan::class, 'id_tanaman');
+    }
 }

@@ -7,16 +7,32 @@ use Illuminate\Support\Facades\Auth;
 
 class MultiAuth
 {
-    public function handle($request, Closure $next, ...$guards)
+/**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  mixed ...$roles  daftar role yang boleh akses
+     */
+    public function handle($request, Closure $next, ...$roles)
     {
-        foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
-                Auth::shouldUse($guard); // pakai guard yg sedang login
-
-                return $next($request);
-            }
+        // Pastikan user sudah login
+        if (!Auth::check()) {
+            return redirect()->route('login');
         }
 
-        return redirect()->route('login'); // jika semua gagal
+        $user = Auth::user();
+
+        // Jika tidak diberikan parameter role, cukup lanjut
+        if (empty($roles)) {
+            return $next($request);
+        }
+
+        // Jika role user tidak ada dalam daftar yang diizinkan
+        if (!in_array($user->role->value, $roles)) {
+            abort(403, 'Anda tidak memiliki izin untuk mengakses halaman ini.');
+        }
+
+        return $next($request);
     }
 }

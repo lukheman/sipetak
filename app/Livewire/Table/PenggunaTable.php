@@ -11,10 +11,9 @@ use App\Models\Kecamatan;
 use App\Models\KepalaDinas;
 use App\Models\Petugas;
 use App\Models\User;
-use App\Traits\Traits\WithModal;
+use App\Traits\WithModal;
 use App\Traits\WithNotify;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -31,24 +30,20 @@ class PenggunaTable extends Component
 
     public $currentState = State::CREATE;
 
-    public $idModal = 'modal-form-pengguna';
+    public string $idModal = 'modal-form-pengguna';
+
+    public string $search = '';
 
     public $kecamatanList;
-
     public $desaList;
-
     public $selectedDesa;
-
     public $selectedKecamatan;
-
     public $kecamatan;
-
-    public $type;
 
     public function mount()
     {
         $this->kecamatanList = Kecamatan::all();
-        $this->desaList = collect(); // Initialize as empty
+        $this->desaList = collect();
     }
 
     public function updatedKecamatan($value)
@@ -56,52 +51,52 @@ class PenggunaTable extends Component
         $this->desaList = $value ? Desa::where('id_kecamatan', $value)->get() : collect();
     }
 
-    public function detail($id, $role)
+    #[Computed]
+    public function users()
     {
-        $role = Role::from($role);
+        return User::query()
+            ->when($this->search, function($query) {
 
-        if ($role === Role::ADMIN) {
-            $user = Admin::with('desa')->find($id);
-        }  elseif ($role === Role::PETUGAS) {
-            $user = Petugas::with('desa')->find($id);
-        } elseif ($role === Role::KEPALADINAS) {
-            $user = KepalaDinas::with('desa')->find($id);
-        }
-
-        $this->form->type = $role->value;
-        $this->currentState = State::SHOW;
-        $this->form->user = $user;
-        $this->form->name = $user->name;
-        $this->form->email = $user->email;
-        $this->form->lokasi = $user->alamat;
-        $this->form->role = $user->role;
-        $this->form->telepon = $user->telepon;
-        $this->form->tanggal_lahir = $user->tanggal_lahir;
-        $this->form->id_desa = $user->desa->id ?? null;
-        $this->kecamatan = $user->desa->id_kecamatan;
-        $this->selectedDesa = $user->desa->nama;
-        $this->selectedKecamatan = Kecamatan::find($user->desa->id_kecamatan)->nama;
-        $this->updatedKecamatan($this->kecamatan); // Load desa list for the selected kecamatan
-        $this->openModal($this->idModal);
-
+                $query->where('nama', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%')
+                    ->orWhere('telepon', 'like', '%' . $this->search . '%');
+            })
+            ->latest()
+            ->paginate(10);
     }
 
-    public function edit($id, $role)
+    public function add()
     {
-        $this->detail($id, $role);
+        $this->form->reset();
+        $this->currentState = State::CREATE;
+        $this->openModal($this->idModal);
+    }
+
+    public function detail($id)
+    {
+
+        $user = User::query()->find($id);
+
+        $this->kecamatan = $user->desa->id_kecamatan ?? null;
+        $this->selectedDesa = $user->desa->nama ?? null;
+        $this->selectedKecamatan = $user->desa?->kecamatan?->nama ?? null;
+
+        $this->form->fillFromModel($user);
+        $this->updatedKecamatan($this->kecamatan);
+
+        $this->currentState = State::SHOW;
+        $this->openModal($this->idModal);
+    }
+
+    public function edit($id)
+    {
+        $this->detail($id);
         $this->currentState = State::UPDATE;
     }
 
     public function save()
     {
-
         if ($this->currentState === State::CREATE) {
-
-            $this->validate([
-                'type' => 'required',
-            ]);
-
-            $this->form->type = $this->type;
             $this->form->store();
             $this->notifySuccess('Pengguna berhasil ditambahkan!');
         } elseif ($this->currentState === State::UPDATE) {
@@ -110,21 +105,11 @@ class PenggunaTable extends Component
         }
 
         $this->closeModal($this->idModal);
-
     }
 
-    public function delete(int $id, $type)
+    public function delete($id)
     {
-        $type = Role::from($type);
-
-        if ($type === Role::ADMIN) {
-            $this->form->user = Admin::findOrFail($id);
-    } elseif ($type === Role::PETUGAS) {
-            $this->form->user = Petugas::findOrFail($id);
-        } elseif ($type === Role::KEPALADINAS) {
-            $this->form->user = KepalaDinas::findOrFail($id);
-        }
-
+        $this->form->user = User::query()->find($id);
         $this->dispatch('deleteConfirmation', message: 'Yakin untuk menghapus pengguna ini?');
     }
 
@@ -135,25 +120,12 @@ class PenggunaTable extends Component
             $this->form->delete();
             $this->notifySuccess('Pengguna berhasil dihapus!');
         } catch (\Exception $e) {
-            $this->notifyError('Gagal menghapus pengguna: '.$e->getMessage());
+            $this->notifyError('Gagal menghapus pengguna: ' . $e->getMessage());
         }
-    }
-
-    public function add()
-    {
-        $this->form->reset();
-        $this->currentState = State::CREATE;
-        $this->openModal($this->idModal);
     }
 
     public function render()
     {
-
-        $users = User::paginate();
-
-
-        return view('livewire.table.pengguna-table', [
-            'users' => $users,
-        ]);
+        return view('livewire.table.pengguna-table');
     }
 }

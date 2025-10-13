@@ -38,7 +38,7 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'admin',
+            'provider' => 'users',
         ],
 
         // 'petani' => [
@@ -46,20 +46,20 @@ return [
         //     'provider' => 'petani',
         // ],
 
-        'admin' => [
-            'driver' => 'session',
-            'provider' => 'admin',
-        ],
-
-        'kepala_dinas' => [
-            'driver' => 'session',
-            'provider' => 'kepala_dinas',
-        ],
-
-        'petugas' => [
-            'driver' => 'session',
-            'provider' => 'petugas',
-        ],
+        // 'admin' => [
+        //     'driver' => 'session',
+        //     'provider' => 'admin',
+        // ],
+        //
+        // 'kepala_dinas' => [
+        //     'driver' => 'session',
+        //     'provider' => 'kepala_dinas',
+        // ],
+        //
+        // 'petugas' => [
+        //     'driver' => 'session',
+        //     'provider' => 'petugas',
+        // ],
     ],
 
     /*
@@ -85,20 +85,20 @@ return [
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
 
-        'admin' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Admin::class,
-        ],
-
-        'petugas' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Petugas::class,
-        ],
-
-        'kepala_dinas' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\KepalaDinas::class,
-        ],
+        // 'admin' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\Admin::class,
+        // ],
+        //
+        // 'petugas' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\Petugas::class,
+        // ],
+        //
+        // 'kepala_dinas' => [
+        //     'driver' => 'eloquent',
+        //     'model' => App\Models\KepalaDinas::class,
+        // ],
 
         // 'users' => [
         //     'driver' => 'database',

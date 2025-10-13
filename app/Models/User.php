@@ -11,14 +11,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    protected $table = 'petani';
-
-    protected $primaryKey = 'id_petani';
+    protected $table = 'users';
 
     protected $guarded = [];
 
@@ -27,17 +25,21 @@ class User extends Model
      *
      * @return array<string, string>
      */
-    // protected function casts(): array
-    // {
-    //     return [
-    //         'email_verified_at' => 'datetime',
-    //         'password' => 'hashed',
-    //     ];
-    // }
-
-    public function getIdAttribute()
+    protected function casts(): array
     {
-        return $this->id_petani;
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+            'role' => Role::class,
+        ];
+    }
+
+    public function laporanSerangan() {
+        return $this->hasMany(LaporanSerangan::class, 'id_user');
+    }
+
+    public function penanganan(): HasOne {
+        return $this->hasOne(Penanganan::class, 'id_user');
     }
 
     public function desa(): BelongsTo {

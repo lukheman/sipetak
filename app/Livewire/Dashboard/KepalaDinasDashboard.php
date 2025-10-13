@@ -13,9 +13,8 @@ class KepalaDinasDashboard extends Component
     public function render()
     {
         return view('livewire.dashboard.kepala-dinas-dashboard', [
-            'jumlah_petani' => User::count(),
-            'jumlah_petugas' => Petugas::count(),
-            'jumlah_hasil_panen' => HasilPanen::count(),
+            'jumlah_petani' => User::query()->where('role', Role::PETANI)->count(),
+            'jumlah_petugas' => User::query()->where('role', Role::PENYULUH)->count(),
         ]);
     }
 }
