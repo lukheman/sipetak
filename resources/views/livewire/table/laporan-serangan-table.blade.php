@@ -361,10 +361,8 @@
                         <th>Tanggal</th>
                         <th>Deskripsi</th>
                         <th>Status</th>
-            @if ($currentState !== State::LAPORAN)
                         <th class="text-end">Aksi</th>
 
-            @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -377,7 +375,6 @@
                                     {{ $item->status->getLabel() }}
                                 </span>
                             </td>
-@if ($currentState !== State::LAPORAN)
 
                             <td class="text-end">
         {{-- PETANI --}}
@@ -432,16 +429,17 @@
 
     @endif
 
+@elseif($activeRole == Role::KEPALADINAS)
 
-
+<!-- link cetak -->
+    <a href="{{ route('print-laporan.laporan-serangan-satu', $item->id) }}" target="_blank" class="btn btn-danger">
+        <i class="mdi mdi-printer"></i> Cetak
+    </a>
 
 
 @endif
-
 
                             </td>
-@endif
-                            
                         </tr>
                     @empty
                         <tr>

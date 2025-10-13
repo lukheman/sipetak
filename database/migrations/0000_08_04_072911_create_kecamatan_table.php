@@ -1,97 +1,28 @@
 <?php
 
-namespace App\Livewire\Table;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use App\Traits\WithModal;
-use App\Traits\WithNotify;
-use Livewire\Attributes\Computed;
-use Livewire\Attributes\On;
-use Livewire\Attributes\Title;
-use Livewire\Component;
-use App\Models\Wilayah;
-use App\Enums\State;
-use App\Livewire\Forms\WilayahForm;
-use Livewire\WithPagination;
-
-#[Title('Wilayah (Kecamatan)')]
-class WilayahTable extends Component
+return new class extends Migration
 {
-    use WithPagination;
-    use WithNotify;
-    use WithModal;
-
-    public WilayahForm $form;
-
-    public $currentState = State::CREATE;
-
-    public string $idModal = 'modal-form-wilayah';
-
-    public string $search = '';
-
-    #[Computed]
-    public function wilayah()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        return Wilayah::query()
-            ->when($this->search, function ($query) {
-                $query->where('nama', 'like', '%' . $this->search . '%');
-            })
-            ->latest('id_kecamatan')
-            ->paginate(10);
+        Schema::create('kecamatan', function (Blueprint $table) {
+            $table->id('id_kecamatan');
+            $table->string('nama');
+            $table->timestamps();
+        });
     }
 
-    public function add()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
-        $this->form->reset();
-        $this->currentState = State::CREATE;
-        $this->openModal($this->idModal);
+        Schema::dropIfExists('kecamatan');
     }
-
-    public function detail($id)
-    {
-        $wilayah = Wilayah::findOrFail($id);
-        $this->form->fillFromModel($wilayah);
-        $this->openModal($this->idModal);
-        $this->currentState = State::SHOW;
-    }
-
-    public function edit(int $id)
-    {
-        $this->detail($id);
-        $this->currentState = State::UPDATE;
-    }
-
-    public function save()
-    {
-        if ($this->currentState === State::CREATE) {
-            $this->form->store();
-            $this->notifySuccess('Wilayah berhasil ditambahkan!');
-        } elseif ($this->currentState === State::UPDATE) {
-            $this->form->update();
-            $this->notifySuccess('Wilayah berhasil diperbarui!');
-        }
-
-        $this->closeModal($this->idModal);
-    }
-
-    public function delete(int $id)
-    {
-        $this->form->wilayah = Wilayah::findOrFail($id);
-        $this->dispatch('deleteConfirmation', message: 'Yakin ingin menghapus wilayah ini?');
-    }
-
-    #[On('deleteConfirmed')]
-    public function deleteConfirmed()
-    {
-        try {
-            $this->form->delete();
-            $this->notifySuccess('Wilayah berhasil dihapus!');
-        } catch (\Exception $e) {
-            $this->notifyError('Gagal menghapus wilayah: ' . $e->getMessage());
-        }
-    }
-
-    public function render()
-    {
-        return view('livewire.table.wilayah-table');
-    }
-}
+};

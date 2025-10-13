@@ -13,7 +13,7 @@ use App\Enums\State;
 use App\Livewire\Forms\WilayahForm;
 use Livewire\WithPagination;
 
-#[Title('Wilayah')]
+#[Title('Manajemen Wilayah')]
 class WilayahTable extends Component
 {
     use WithPagination;

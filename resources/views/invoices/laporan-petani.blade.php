@@ -1,5 +1,3 @@
-
-
 <x-laporan.index>
 
     <x-laporan.navbar-download :pdf="$pdf" />

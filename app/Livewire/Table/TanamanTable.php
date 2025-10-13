@@ -14,7 +14,7 @@ use App\Livewire\Forms\TanamanForm;
 use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 
-#[Title('Tanaman')]
+#[Title('Manajemen Tanaman')]
 class TanamanTable extends Component
 {
     use WithFileUploads;

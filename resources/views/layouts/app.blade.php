@@ -42,10 +42,11 @@
           </div>
           <div>
             <a class="navbar-brand brand-logo" href="index.html">
-              <img src="{{ asset('assets/images/logo.svg')}}" alt="logo" />
+              <!-- <img src="{{ asset('assets/images/logo.svg')}}" alt="logo" /> -->
+              <span class="fw-bold">SiPetak</span>
             </a>
             <a class="navbar-brand brand-logo-mini" href="index.html">
-              <img src="{{ asset('assets/images/logo-mini.svg')}}" alt="logo" />
+              <!-- <img src="{{ asset('assets/images/logo-mini.svg')}}" alt="logo" /> -->
             </a>
           </div>
         </div>
@@ -58,12 +59,13 @@
           <ul class="navbar-nav ms-auto">
             <li class="nav-item dropdown d-none d-lg-block user-dropdown">
               <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                <img class="img-xs rounded-circle" src="{{ asset('assets/images/faces/face8.jpg')}}" alt="Profile image"> </a>
+                <img class="img-xs rounded-circle" src="{{ auth()->user()->photo ? asset('storage/' . auth()->user()->photo) : asset('assets/images/faces/face8.jpg') }}" alt="Profile image"> </a>
+
               <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
                 <div class="dropdown-header text-center">
-                  <img class="img-md rounded-circle" src="{{ asset('assets/images/faces/face8.jpg')}}" alt="Profile image">
-                  <p class="mb-1 mt-3 fw-semibold">Allen Moreno</p>
-                  <p class="fw-light text-muted mb-0">allenmoreno@gmail.com</p>
+                  <img class="img-md rounded-circle" src="{{ auth()->user()->photo ? asset('storage/' . auth()->user()->photo) : asset('assets/images/faces/face8.jpg') }}" alt="Profile image" width="40" height="40">
+                  <p class="mb-1 mt-3 fw-semibold">{{ getActiveUser()->nama}}</p>
+                  <p class="fw-light text-muted mb-0">{{ getActiveUser()->email}}</p>
                 </div>
                 <a class="dropdown-item" href="{{ route('profile')}}"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> Profile Ku </a>
                 <a class="dropdown-item" href="{{ route('logout')}}"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Keluar</a>

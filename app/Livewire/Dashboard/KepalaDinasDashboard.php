@@ -3,7 +3,6 @@
 namespace App\Livewire\Dashboard;
 
 use App\Enums\Role;
-use App\Models\HasilPanen;
 use App\Models\Petugas;
 use App\Models\User;
 use Livewire\Component;

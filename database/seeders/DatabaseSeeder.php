@@ -6,7 +6,6 @@ use App\Models\Kecamatan;
 use App\Models\KepalaDinas;
 use App\Models\User;
 use App\Models\Petugas;
-use App\Models\HasilPanen;
 use App\Models\Tanaman;
 use Database\Seeders\PenyebabSeranganSeeder;
 use Database\Seeders\TanamanSeeder;
@@ -66,7 +65,6 @@ class DatabaseSeeder extends Seeder
         //     ->create();
 
         // Tanaman::factory(10)->create();
-        // HasilPanen::factory(10)->create();
 
         // buat User
 
