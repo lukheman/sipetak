@@ -101,10 +101,15 @@ class LaporanSeranganTable extends Component
     #[Computed]
     public function laporanSerangan()
     {
-        return LaporanSerangan::query()
-            ->when($this->search, fn($q) => $q->where('deskripsi', 'like', '%'.$this->search.'%'))
-            ->latest()
-            ->paginate(10);
+        $query = LaporanSerangan::query()
+            ->when($this->search, fn($q) => $q->where('deskripsi', 'like', '%'.$this->search.'%'));
+
+        if (getActiveUserRole() === Role::PETANI) {
+            $query->where('id_user', getActiveUserId());
+        }
+
+        return $query->latest()->paginate(10);
+
     }
 
     public function add()
