@@ -12,6 +12,8 @@
         <livewire:dashboard.kepala-dinas-dashboard />
     @elseif($role === Role::PENYULUH)
         <livewire:dashboard.petugas-dashboard />
+    @elseif($role === Role::PETANI)
+        <livewire:dashboard.petani-dashboard />
     @endif
 
 </div>

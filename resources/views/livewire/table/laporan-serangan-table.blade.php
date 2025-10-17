@@ -433,7 +433,7 @@
 
 <!-- link cetak -->
     <a href="{{ route('print-laporan.laporan-serangan-satu', $item->id) }}" target="_blank" class="btn btn-danger">
-        <i class="mdi mdi-printer"></i> Cetak
+        <i class="mdi mdi-printer"></i> Download
     </a>
 
 

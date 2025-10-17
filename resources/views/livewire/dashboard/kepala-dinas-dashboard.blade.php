@@ -1,6 +1,6 @@
 <div class="row">
     <!-- Jumlah Petani -->
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-6">
         <div class="card rounded-3 h-100">
             <div class="card-body d-flex align-items-center p-4">
                 <!-- Icon -->
@@ -17,7 +17,7 @@
     </div>
 
     <!-- Jumlah Ahli Pertanian -->
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-6">
         <div class="card rounded-3 h-100">
             <div class="card-body d-flex align-items-center p-4">
                 <!-- Icon -->

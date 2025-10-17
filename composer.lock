@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b103c42eefc6f94c8bbb5a7cc435b8a9",
+    "content-hash": "b31014567ea3c96d691c00f014bc5ce8",
     "packages": [
         {
             "name": "barryvdh/laravel-dompdf",
@@ -457,16 +457,16 @@
         },
         {
             "name": "dompdf/dompdf",
-            "version": "v3.1.0",
+            "version": "v3.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dompdf/dompdf.git",
-                "reference": "a51bd7a063a65499446919286fb18b518177155a"
+                "reference": "baed300e4fb8226359c04395518059a136e2a2e2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/a51bd7a063a65499446919286fb18b518177155a",
-                "reference": "a51bd7a063a65499446919286fb18b518177155a",
+                "url": "https://api.github.com/repos/dompdf/dompdf/zipball/baed300e4fb8226359c04395518059a136e2a2e2",
+                "reference": "baed300e4fb8226359c04395518059a136e2a2e2",
                 "shasum": ""
             },
             "require": {
@@ -515,9 +515,9 @@
             "homepage": "https://github.com/dompdf/dompdf",
             "support": {
                 "issues": "https://github.com/dompdf/dompdf/issues",
-                "source": "https://github.com/dompdf/dompdf/tree/v3.1.0"
+                "source": "https://github.com/dompdf/dompdf/tree/v3.1.3"
             },
-            "time": "2025-01-15T14:09:04+00:00"
+            "time": "2025-10-14T13:10:17+00:00"
         },
         {
             "name": "dompdf/php-font-lib",

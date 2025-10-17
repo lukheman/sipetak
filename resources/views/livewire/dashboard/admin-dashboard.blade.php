@@ -33,23 +33,4 @@
         </div>
     </div>
 
-    <div class="col-12 col-md-6">
-        <div class="card rounded-3">
-            <div class="card-body">
-                <h6 class="mb-3">5 Tanaman dengan Data Panen Terbanyak</h6>
-                <div id="chart"></div> <!-- pastikan ini ada -->
-            </div>
-        </div>
-    </div>
-
-    <div class="col-12 col-md-6">
-        <div class="card rounded-3">
-            <div class="card-body">
-                <h6 class="mb-3">5 Tanaman dengan Data Panen Terbanyak</h6>
-                <div id="funnelChart"></div>
-            </div>
-        </div>
-    </div>
-
-
 </div>

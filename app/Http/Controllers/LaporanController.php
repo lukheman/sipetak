@@ -23,7 +23,10 @@ class LaporanController extends Controller
     public function laporanSeranganSatu($id_laporan) {
         $laporan = LaporanSerangan::query()->with('tanaman', 'user', 'penanganan', 'penyebabSerangan')->find($id_laporan);
 
-        return view('invoices.laporan-serangan-satu', ['laporan' => $laporan]);
+        $pdf = Pdf::loadView('invoices.laporan-serangan-satu', ['laporan' => $laporan]);
+
+        return $pdf->download('laporan_serangan_tanamanan_'.date('d_m_Y').'.pdf');
+
     }
 
 }

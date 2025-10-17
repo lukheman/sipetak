@@ -9,11 +9,10 @@
                 </div>
                 <!-- Content -->
                 <div>
-                    <h6 class="mb-1">Jumlah Seluruh Petani di Kecamatan {{ $kecamatan }}</h6>
-                    <h4 class="fw-bold mb-0">{{ $jumlah_petani }}</h4>
+                    <h6 class="mb-1">Jumlah Laporan</h6>
+                    <h4 class="fw-bold mb-0">{{ $jumlah_laporan }}</h4>
                 </div>
             </div>
         </div>
     </div>
-
 </div>
