@@ -33,7 +33,7 @@ class PenyebabSeranganTable extends Component
     {
         return PenyebabSerangan::query()
             ->when($this->search, function ($query) {
-                $query->where('nama_penyebab', 'like', '%' . $this->search . '%');
+                $query->where('nama', 'like', '%' . $this->search . '%');
             })
             ->latest()
             ->paginate(10);
