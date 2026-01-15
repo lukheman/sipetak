@@ -10,7 +10,8 @@ class Penanganan extends Model
     protected $table = 'penanganan';
     protected $guarded = [];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class, 'id_user');
     }
 
@@ -19,4 +20,8 @@ class Penanganan extends Model
         return $this->belongsTo(LaporanSerangan::class, 'id_laporan_serangan');
     }
 
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'id_admin', 'id_admin');
+    }
 }

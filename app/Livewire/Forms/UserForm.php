@@ -43,8 +43,14 @@ class UserForm extends Form
                 'numeric'
             ],
             'role' => ['required'],
-            'id_desa' => 'required|exists:desa,id_desa',
         ];
+
+        // id_desa hanya required jika role bukan Admin atau Kepala Dinas
+        if (!in_array($this->role, ['Admin', 'Kepala Dinas'])) {
+            $rules['id_desa'] = 'required|exists:desa,id_desa';
+        } else {
+            $rules['id_desa'] = 'nullable';
+        }
 
         // Validasi file hanya jika upload baru
         if ($this->photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {

@@ -60,6 +60,19 @@
                             @error('form.telepon') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <select wire:model.live="form.role" id="role" class="form-control"
+                                @if ($currentState === State::SHOW) disabled @endif>
+                                <option value="">Pilih Role</option>
+                                @foreach (\App\Enums\Role::values() as $role)
+                                    <option value="{{ $role }}">{{ $role }}</option>
+                                @endforeach
+                            </select>
+                            @error('form.role') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+
+                        @if (!in_array($form->role, ['Admin', 'Kepala Dinas']))
                         <div class="row">
     <div class="col-6">
 
@@ -93,19 +106,7 @@
                         </div>
     </div>
     </div>
-
-
-                        <div class="mb-3">
-                            <label for="role" class="form-label">Role</label>
-                            <select wire:model="form.role" id="role" class="form-control"
-                                @if ($currentState === State::SHOW) disabled @endif>
-                                <option value="">Pilih Role</option>
-                                @foreach (\App\Enums\Role::getOptions() as $role)
-                                    <option value="{{ $role }}">{{ $role }}</option>
-                                @endforeach
-                            </select>
-                            @error('form.role') <small class="text-danger">{{ $message }}</small> @enderror
-                        </div>
+                        @endif
 
                     </form>
                 </div>

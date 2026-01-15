@@ -13,17 +13,20 @@ class LaporanSerangan extends Model
     protected $table = 'laporan_serangan';
     protected $guarded = [];
 
-    public function casts(): array {
+    public function casts(): array
+    {
         return [
             'status' => \App\Enums\StatusLaporan::class,
         ];
     }
 
-    public function tanaman() {
+    public function tanaman()
+    {
         return $this->belongsTo(Tanaman::class, 'id_tanaman');
     }
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class, 'id_user');
     }
 
@@ -32,7 +35,13 @@ class LaporanSerangan extends Model
         return $this->hasOne(Penanganan::class, 'id_laporan_serangan');
     }
 
-    public function penyebabSerangan() {
+    public function penyebabSerangan()
+    {
         return $this->belongsToMany(PenyebabSerangan::class, 'detail_laporan_serangan', 'id_laporan_serangan', 'id_penyebab_serangan');
+    }
+
+    public function kepalaDinas()
+    {
+        return $this->belongsTo(KepalaDinas::class, 'id_kepala_dinas', 'id_kepala_dinas');
     }
 }

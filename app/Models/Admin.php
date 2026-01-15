@@ -13,8 +13,25 @@ class Admin extends Authenticatable
 
     protected $guarded = [];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($admin) {
+            if (self::count() >= 1) {
+                throw new \Exception('Hanya boleh ada satu Admin dalam sistem.');
+            }
+        });
+    }
+
     public function getRoleAttribute()
     {
         return Role::ADMIN;
     }
+
+    public function penanganan()
+    {
+        return $this->hasMany(Penanganan::class, 'id_admin', 'id_admin');
+    }
 }
+
