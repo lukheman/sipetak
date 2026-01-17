@@ -37,36 +37,41 @@ class LaporanSeranganTable extends Component
 
     public array $selectedPenyebab = []; // id
 
-    public function mount() {
-        if(getActiveUserRole() === Role::KEPALADINAS) {
+    public function mount()
+    {
+        if (getActiveUserRole() === Role::KEPALADINAS) {
 
             $this->currentState = State::LAPORAN;
 
         }
     }
 
-    public function terimaLaporan($id_laporan) {
+    public function terimaLaporan($id_laporan)
+    {
         $this->form->fillFromId($id_laporan);
         $this->form->terimaLaporan();
         $this->notifySuccess('Laporan serangan telah diterima!');
         $this->closeModal('modal-detail-laporan-serangan');
     }
 
-    public function tolakLaporan($id_laporan) {
+    public function tolakLaporan($id_laporan)
+    {
         $this->form->fillFromId($id_laporan);
         $this->form->tolakLaporan();
         $this->notifySuccess('Laporan serangan telah ditolak!');
         $this->closeModal('modal-detail-laporan-serangan');
     }
 
-    public function selesaiLaporan($id_laporan) {
+    public function selesaiLaporan($id_laporan)
+    {
         $this->form->fillFromId($id_laporan);
         $this->form->selesaiLaporan();
         $this->notifySuccess('Laporan serangan telah diselesaikan!');
         $this->closeModal('modal-detail-laporan-serangan');
     }
 
-    public function simpanPenanganan() {
+    public function simpanPenanganan()
+    {
         $this->form->updatePenanganan();
         $this->notifySuccess('Penanganan berhasil disimpan!');
         $this->closeModal('modal-detail-laporan-serangan');
@@ -84,15 +89,22 @@ class LaporanSeranganTable extends Component
     }
 
     #[Computed]
-    public function penyebabSeranganList()
+    public function hamaList()
     {
-        return PenyebabSerangan::all();
+        return PenyebabSerangan::where('tipe', PenyebabSerangan::TIPE_HAMA)->get();
     }
 
     #[Computed]
-    public function tanamanList() {
+    public function penyakitList()
+    {
+        return PenyebabSerangan::where('tipe', PenyebabSerangan::TIPE_PENYAKIT)->get();
+    }
+
+    #[Computed]
+    public function tanamanList()
+    {
         return Tanaman::query()
-            ->when($this->searchTanaman, fn($q) => $q->where('nama_tanaman', 'like', '%'.$this->searchTanaman.'%'))
+            ->when($this->searchTanaman, fn($q) => $q->where('nama_tanaman', 'like', '%' . $this->searchTanaman . '%'))
             ->latest()
             ->get();
     }
@@ -102,7 +114,7 @@ class LaporanSeranganTable extends Component
     public function laporanSerangan()
     {
         $query = LaporanSerangan::query()
-            ->when($this->search, fn($q) => $q->where('deskripsi', 'like', '%'.$this->search.'%'));
+            ->when($this->search, fn($q) => $q->where('deskripsi', 'like', '%' . $this->search . '%'));
 
         if (getActiveUserRole() === Role::PETANI) {
             $query->where('id_user', getActiveUserId());
@@ -165,7 +177,7 @@ class LaporanSeranganTable extends Component
             $this->form->delete();
             $this->notifySuccess('Laporan serangan berhasil dihapus!');
         } catch (\Exception $e) {
-            $this->notifyError('Gagal menghapus laporan: '.$e->getMessage());
+            $this->notifyError('Gagal menghapus laporan: ' . $e->getMessage());
         }
     }
 

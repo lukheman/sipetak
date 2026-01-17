@@ -10,12 +10,14 @@ class PenyebabSeranganForm extends Form
     public ?PenyebabSerangan $penyebabSerangan = null;
 
     public string $nama = '';
+    public string $tipe = PenyebabSerangan::TIPE_HAMA;
     public string $deskripsi = '';
 
     public function rules(): array
     {
         return [
             'nama' => ['required', 'string', 'min:3', 'max:100'],
+            'tipe' => ['required', 'in:hama,penyakit'],
             'deskripsi' => ['nullable', 'string'],
         ];
     }
@@ -26,6 +28,8 @@ class PenyebabSeranganForm extends Form
             'nama.required' => 'Nama penyebab wajib diisi.',
             'nama.min' => 'Nama penyebab minimal 3 karakter.',
             'nama.max' => 'Nama penyebab maksimal 100 karakter.',
+            'tipe.required' => 'Tipe penyebab wajib dipilih.',
+            'tipe.in' => 'Tipe penyebab harus Hama atau Penyakit.',
             'deskripsi.string' => 'Deskripsi harus berupa teks yang valid.',
         ];
     }
@@ -37,6 +41,7 @@ class PenyebabSeranganForm extends Form
     {
         $this->penyebabSerangan = $penyebab;
         $this->nama = $penyebab->nama;
+        $this->tipe = $penyebab->tipe ?? PenyebabSerangan::TIPE_HAMA;
         $this->deskripsi = $penyebab->deskripsi ?? '';
     }
 
@@ -59,6 +64,7 @@ class PenyebabSeranganForm extends Form
         if ($this->penyebabSerangan) {
             $this->penyebabSerangan->update([
                 'nama' => $this->nama,
+                'tipe' => $this->tipe,
                 'deskripsi' => $this->deskripsi,
             ]);
         }
@@ -77,3 +83,4 @@ class PenyebabSeranganForm extends Form
         }
     }
 }
+

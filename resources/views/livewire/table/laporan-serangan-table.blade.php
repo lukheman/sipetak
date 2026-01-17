@@ -85,8 +85,16 @@
                         @if ($selectedLaporan->penyebabSerangan->count())
                             <ul class="list-group list-group-flush">
                                 @foreach ($selectedLaporan->penyebabSerangan as $penyebab)
-                                    <li class="list-group-item">
-                                        <i class="mdi mdi-bug-outline text-danger me-2"></i>
+                                    <li class="list-group-item d-flex align-items-center">
+                                        @if ($penyebab->isHama())
+                                            <span class="badge bg-warning text-dark me-2">
+                                                <i class="mdi mdi-bug me-1"></i>Hama
+                                            </span>
+                                        @else
+                                            <span class="badge bg-danger me-2">
+                                                <i class="mdi mdi-virus me-1"></i>Penyakit
+                                            </span>
+                                        @endif
                                         {{ $penyebab->nama }}
                                     </li>
                                 @endforeach
@@ -202,27 +210,54 @@
                 </div>
             </div>
         </div>
-  <!-- Section: Penyebab Serangan -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-light fw-semibold">
-                <i class="mdi mdi-bug-outline me-1"></i> Pilih Penyebab Serangan
+  <!-- Section: Penyebab Serangan - HAMA -->
+        <div class="card border-0 shadow-sm mb-3">
+            <div class="card-header bg-warning bg-opacity-25 fw-semibold">
+                <i class="mdi mdi-bug me-1 text-warning"></i> Pilih Hama
             </div>
             <div class="card-body">
-                @forelse ($this->penyebabSeranganList as $penyebab)
+                @forelse ($this->hamaList as $hama)
                     <div class="form-check mb-2 ms-3">
                         <input
                             class="form-check-input"
                             type="checkbox"
-                            value="{{ $penyebab->id }}"
-                            id="penyebab-{{ $penyebab->id }}"
+                            value="{{ $hama->id }}"
+                            id="penyebab-{{ $hama->id }}"
                             wire:model="selectedPenyebab"
                         >
-                        <label class="form-check-label" for="penyebab-{{ $penyebab->id }}">
-                            {{ $penyebab->nama }}
+                        <label class="form-check-label" for="penyebab-{{ $hama->id }}">
+                            <span class="badge bg-warning text-dark me-1">Hama</span>
+                            {{ $hama->nama }}
                         </label>
                     </div>
                 @empty
-                    <p class="text-muted fst-italic">Tidak ada data penyebab serangan.</p>
+                    <p class="text-muted fst-italic">Tidak ada data hama.</p>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Section: Penyebab Serangan - PENYAKIT -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-danger bg-opacity-25 fw-semibold">
+                <i class="mdi mdi-virus me-1 text-danger"></i> Pilih Penyakit
+            </div>
+            <div class="card-body">
+                @forelse ($this->penyakitList as $penyakit)
+                    <div class="form-check mb-2 ms-3">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            value="{{ $penyakit->id }}"
+                            id="penyebab-{{ $penyakit->id }}"
+                            wire:model="selectedPenyebab"
+                        >
+                        <label class="form-check-label" for="penyebab-{{ $penyakit->id }}">
+                            <span class="badge bg-danger me-1">Penyakit</span>
+                            {{ $penyakit->nama }}
+                        </label>
+                    </div>
+                @empty
+                    <p class="text-muted fst-italic">Tidak ada data penyakit.</p>
                 @endforelse
             </div>
         </div>

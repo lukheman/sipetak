@@ -1,5 +1,6 @@
 @php
     use App\Enums\State;
+    use App\Models\PenyebabSerangan;
 @endphp
 
 <div>
@@ -29,6 +30,20 @@
                                    id="nama" placeholder="Masukkan nama penyebab serangan"
                                    @if ($currentState === State::SHOW) disabled @endif>
                             @error('form.nama')
+                                <small class="d-block mt-1 text-danger">{{ $message }}</small>
+                            @enderror
+                        </div>
+
+                        <!-- Tipe -->
+                        <div class="mb-3">
+                            <label for="tipe" class="form-label">Tipe Penyebab</label>
+                            <select wire:model="form.tipe" class="form-select" id="tipe"
+                                    @if ($currentState === State::SHOW) disabled @endif>
+                                @foreach (PenyebabSerangan::TIPE_OPTIONS as $value => $label)
+                                    <option value="{{ $value }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+                            @error('form.tipe')
                                 <small class="d-block mt-1 text-danger">{{ $message }}</small>
                             @enderror
                         </div>
@@ -66,11 +81,40 @@
         </div>
 
         <div class="card-body">
+            <!-- Tabs Filter: Semua | Hama | Penyakit -->
+            <ul class="nav nav-tabs mb-3">
+                <li class="nav-item">
+                    <button wire:click="setActiveTab('all')"
+                            class="nav-link {{ $activeTab === 'all' ? 'active' : '' }}">
+                        <i class="mdi mdi-view-list me-1"></i>
+                        Semua
+                        <span class="badge bg-secondary ms-1">{{ $this->countAll }}</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button wire:click="setActiveTab('hama')"
+                            class="nav-link {{ $activeTab === 'hama' ? 'active' : '' }}">
+                        <i class="mdi mdi-bug me-1"></i>
+                        Hama
+                        <span class="badge bg-warning text-dark ms-1">{{ $this->countHama }}</span>
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button wire:click="setActiveTab('penyakit')"
+                            class="nav-link {{ $activeTab === 'penyakit' ? 'active' : '' }}">
+                        <i class="mdi mdi-virus me-1"></i>
+                        Penyakit
+                        <span class="badge bg-danger ms-1">{{ $this->countPenyakit }}</span>
+                    </button>
+                </li>
+            </ul>
+
             <div class="table-responsive">
                 <table class="table table-striped">
                     <thead class="thead-dark">
                         <tr>
                             <th>Nama Penyebab Serangan</th>
+                            <th>Tipe</th>
                             <th>Deskripsi</th>
                             <th class="text-end">Aksi</th>
                         </tr>
@@ -79,15 +123,32 @@
                         @forelse ($this->penyebabSerangan as $item)
                             <tr>
                                 <td>{{ $item->nama }}</td>
-                                <td>{{ Str::limit($item->deskripsi, 100, '...') }}</td>
+                                <td>
+                                    @if ($item->isHama())
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="mdi mdi-bug me-1"></i>Hama
+                                        </span>
+                                    @else
+                                        <span class="badge bg-danger">
+                                            <i class="mdi mdi-virus me-1"></i>Penyakit
+                                        </span>
+                                    @endif
+                                </td>
+                                <td>{{ Str::limit($item->deskripsi, 80, '...') }}</td>
                                 <td class="text-end">
                                     <x-datatable.actions :id="$item->id" />
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="3" class="text-center text-muted py-3">
-                                    Tidak ada data penyebab serangan.
+                                <td colspan="4" class="text-center text-muted py-3">
+                                    @if ($activeTab === 'all')
+                                        Tidak ada data penyebab serangan.
+                                    @elseif ($activeTab === 'hama')
+                                        Tidak ada data hama.
+                                    @else
+                                        Tidak ada data penyakit.
+                                    @endif
                                 </td>
                             </tr>
                         @endforelse

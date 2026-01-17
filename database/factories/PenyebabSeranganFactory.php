@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\PenyebabSerangan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +19,9 @@ class PenyebabSeranganFactory extends Factory
     {
         return [
             'nama' => $this->faker->name(),
+            'tipe' => $this->faker->randomElement([PenyebabSerangan::TIPE_HAMA, PenyebabSerangan::TIPE_PENYAKIT]),
             'deskripsi' => $this->faker->text()
         ];
     }
 }
+

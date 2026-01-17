@@ -28,6 +28,8 @@ class PenyebabSeranganTable extends Component
 
     public string $search = '';
 
+    public string $activeTab = 'all';
+
     #[Computed]
     public function penyebabSerangan()
     {
@@ -35,8 +37,35 @@ class PenyebabSeranganTable extends Component
             ->when($this->search, function ($query) {
                 $query->where('nama', 'like', '%' . $this->search . '%');
             })
+            ->when($this->activeTab !== 'all', function ($query) {
+                $query->where('tipe', $this->activeTab);
+            })
             ->latest()
             ->paginate(10);
+    }
+
+    #[Computed]
+    public function countAll(): int
+    {
+        return PenyebabSerangan::count();
+    }
+
+    #[Computed]
+    public function countHama(): int
+    {
+        return PenyebabSerangan::where('tipe', PenyebabSerangan::TIPE_HAMA)->count();
+    }
+
+    #[Computed]
+    public function countPenyakit(): int
+    {
+        return PenyebabSerangan::where('tipe', PenyebabSerangan::TIPE_PENYAKIT)->count();
+    }
+
+    public function setActiveTab(string $tab): void
+    {
+        $this->activeTab = $tab;
+        $this->resetPage();
     }
 
     public function add()
@@ -95,3 +124,4 @@ class PenyebabSeranganTable extends Component
         return view('livewire.table.penyebab-serangan-table');
     }
 }
+
