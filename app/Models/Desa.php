@@ -17,7 +17,12 @@ class Desa extends Model
 
     public function petani()
     {
-        return $this->hasMany(User::class, 'id_petani', 'id_desa');
+        return $this->hasMany(Petani::class, 'id_desa', 'id_desa');
+    }
+
+    public function penyuluh()
+    {
+        return $this->hasMany(Penyuluh::class, 'id_desa', 'id_desa');
     }
 
     public function kecamatan()

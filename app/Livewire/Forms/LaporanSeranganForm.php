@@ -16,19 +16,22 @@ class LaporanSeranganForm extends Form
 
     public ?string $penanganan;
 
-    public function terimaLaporan() {
+    public function terimaLaporan()
+    {
         $this->laporan?->update([
             'status' => StatusLaporan::IN_PROGRESS,
         ]);
     }
 
-    public function tolakLaporan() {
+    public function tolakLaporan()
+    {
         $this->laporan?->update([
             'status' => StatusLaporan::REJECTED,
         ]);
     }
 
-    public function selesaiLaporan() {
+    public function selesaiLaporan()
+    {
         $this->laporan?->update([
             'status' => StatusLaporan::RESOLVED,
         ]);
@@ -63,18 +66,16 @@ class LaporanSeranganForm extends Form
         $this->penanganan = $laporan->penanganan->isi_penanganan ?? null;
     }
 
-    public function store(array $penyebabSerangan): void
+    public function store(): void
     {
         $this->validate();
 
-        $laporanSerangan = LaporanSerangan::query()->create([
+        LaporanSerangan::query()->create([
             'id_tanaman' => $this->tanaman->id,
-            'id_user' => getActiveUserId(),
+            'id_petani' => getActiveUserId(),
             'tanggal_laporan' => now(),
             'deskripsi' => $this->deskripsi,
         ]);
-
-        $laporanSerangan->penyebabSerangan()->attach($penyebabSerangan);
 
         $this->reset();
     }
@@ -85,9 +86,7 @@ class LaporanSeranganForm extends Form
 
         if ($this->laporan) {
             $this->laporan->update([
-                'tanggal_laporan' => $this->tanggal_laporan,
                 'deskripsi' => $this->deskripsi,
-                'status' => $this->status,
             ]);
             $this->reset();
         }
@@ -97,8 +96,10 @@ class LaporanSeranganForm extends Form
     {
         $this->laporan?->penanganan()->updateOrCreate(
             ['id_laporan_serangan' => $this->laporan->id],
-            ['isi_penanganan' => $this->penanganan,
-            'id_user' => getActiveUserId(),]
+            [
+                'isi_penanganan' => $this->penanganan,
+                'id_penyuluh' => getActiveUserId(),
+            ]
         );
 
     }

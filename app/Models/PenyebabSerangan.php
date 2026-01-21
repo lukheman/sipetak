@@ -21,11 +21,6 @@ class PenyebabSerangan extends Model
     protected $table = 'penyebab_serangan';
     protected $guarded = [];
 
-    public function laporanSerangan()
-    {
-        return $this->belongsToMany(LaporanSerangan::class, 'detail_laporan_serangan', 'id_penyebab_serangan', 'id_laporan_serangan');
-    }
-
     /**
      * Check if this penyebab serangan is Hama type
      */
@@ -48,5 +43,10 @@ class PenyebabSerangan extends Model
     public function getTipeLabelAttribute(): string
     {
         return self::TIPE_OPTIONS[$this->tipe] ?? ucfirst($this->tipe);
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'id_admin', 'id_admin');
     }
 }

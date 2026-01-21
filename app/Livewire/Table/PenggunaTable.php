@@ -2,15 +2,12 @@
 
 namespace App\Livewire\Table;
 
-use App\Enums\Role;
 use App\Enums\State;
 use App\Livewire\Forms\UserForm;
-use App\Models\Admin;
 use App\Models\Desa;
 use App\Models\Kecamatan;
-use App\Models\KepalaDinas;
-use App\Models\Petugas;
-use App\Models\User;
+use App\Models\Petani;
+use App\Models\Penyuluh;
 use App\Traits\WithModal;
 use App\Traits\WithNotify;
 use Livewire\Attributes\Computed;
@@ -34,6 +31,8 @@ class PenggunaTable extends Component
 
     public string $search = '';
 
+    public string $userType = 'petani'; // 'petani' or 'penyuluh'
+
     public $kecamatanList;
     public $desaList;
     public $selectedDesa;
@@ -54,9 +53,10 @@ class PenggunaTable extends Component
     #[Computed]
     public function users()
     {
-        return User::query()
-            ->when($this->search, function($query) {
+        $model = $this->userType === 'penyuluh' ? Penyuluh::class : Petani::class;
 
+        return $model::query()
+            ->when($this->search, function ($query) {
                 $query->where('nama', 'like', '%' . $this->search . '%')
                     ->orWhere('email', 'like', '%' . $this->search . '%')
                     ->orWhere('telepon', 'like', '%' . $this->search . '%');
@@ -65,23 +65,30 @@ class PenggunaTable extends Component
             ->paginate(10);
     }
 
+    public function setUserType($type)
+    {
+        $this->userType = $type;
+        $this->resetPage();
+    }
+
     public function add()
     {
         $this->form->reset();
+        $this->form->userType = $this->userType;
         $this->currentState = State::CREATE;
         $this->openModal($this->idModal);
     }
 
     public function detail($id)
     {
-
-        $user = User::query()->find($id);
+        $model = $this->userType === 'penyuluh' ? Penyuluh::class : Petani::class;
+        $user = $model::query()->find($id);
 
         $this->kecamatan = $user->desa->id_kecamatan ?? null;
         $this->selectedDesa = $user->desa->nama ?? null;
         $this->selectedKecamatan = $user->desa?->kecamatan?->nama ?? null;
 
-        $this->form->fillFromModel($user);
+        $this->form->fillFromModel($user, $this->userType);
         $this->updatedKecamatan($this->kecamatan);
 
         $this->currentState = State::SHOW;
@@ -109,7 +116,9 @@ class PenggunaTable extends Component
 
     public function delete($id)
     {
-        $this->form->user = User::query()->find($id);
+        $model = $this->userType === 'penyuluh' ? Penyuluh::class : Petani::class;
+        $this->form->user = $model::query()->find($id);
+        $this->form->userType = $this->userType;
         $this->dispatch('deleteConfirmation', message: 'Yakin untuk menghapus pengguna ini?');
     }
 

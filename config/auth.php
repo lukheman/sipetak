@@ -15,7 +15,7 @@ return [
 
     'defaults' => [
         'guard' => env('AUTH_GUARD', 'web'),
-        'passwords' => env('AUTH_PASSWORD_BROKER', 'users'),
+        'passwords' => env('AUTH_PASSWORD_BROKER', 'petani'),
     ],
 
     /*
@@ -38,28 +38,28 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'petani',
         ],
 
-        // 'petani' => [
-        //     'driver' => 'session',
-        //     'provider' => 'petani',
-        // ],
+        'petani' => [
+            'driver' => 'session',
+            'provider' => 'petani',
+        ],
 
-        // 'admin' => [
-        //     'driver' => 'session',
-        //     'provider' => 'admin',
-        // ],
-        //
-        // 'kepala_dinas' => [
-        //     'driver' => 'session',
-        //     'provider' => 'kepala_dinas',
-        // ],
-        //
-        // 'petugas' => [
-        //     'driver' => 'session',
-        //     'provider' => 'petugas',
-        // ],
+        'penyuluh' => [
+            'driver' => 'session',
+            'provider' => 'penyuluh',
+        ],
+
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admin',
+        ],
+
+        'kepala_dinas' => [
+            'driver' => 'session',
+            'provider' => 'kepala_dinas',
+        ],
     ],
 
     /*
@@ -80,30 +80,25 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'petani' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => App\Models\Petani::class,
         ],
 
-        // 'admin' => [
-        //     'driver' => 'eloquent',
-        //     'model' => App\Models\Admin::class,
-        // ],
-        //
-        // 'petugas' => [
-        //     'driver' => 'eloquent',
-        //     'model' => App\Models\Petugas::class,
-        // ],
-        //
-        // 'kepala_dinas' => [
-        //     'driver' => 'eloquent',
-        //     'model' => App\Models\KepalaDinas::class,
-        // ],
+        'penyuluh' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Penyuluh::class,
+        ],
 
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'admin' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
+
+        'kepala_dinas' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\KepalaDinas::class,
+        ],
     ],
 
     /*
@@ -126,8 +121,14 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
+        'petani' => [
+            'provider' => 'petani',
+            'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'penyuluh' => [
+            'provider' => 'penyuluh',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
             'expire' => 60,
             'throttle' => 60,

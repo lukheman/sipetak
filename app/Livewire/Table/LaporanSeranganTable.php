@@ -117,7 +117,7 @@ class LaporanSeranganTable extends Component
             ->when($this->search, fn($q) => $q->where('deskripsi', 'like', '%' . $this->search . '%'));
 
         if (getActiveUserRole() === Role::PETANI) {
-            $query->where('id_user', getActiveUserId());
+            $query->where('id_petani', getActiveUserId());
         }
 
         return $query->latest()->paginate(10);
@@ -134,7 +134,7 @@ class LaporanSeranganTable extends Component
     public function detail($id)
     {
         $laporan = LaporanSerangan::query()
-            ->with('penyebabSerangan', 'tanaman')
+            ->with('tanaman')
             ->findOrFail($id);
 
         $this->selectedLaporan = $laporan;
@@ -153,7 +153,7 @@ class LaporanSeranganTable extends Component
     public function save()
     {
         if ($this->currentState === State::CREATE) {
-            $this->form->store($this->selectedPenyebab);
+            $this->form->store();
             $this->notifySuccess('Laporan serangan berhasil ditambahkan!');
         } elseif ($this->currentState === State::UPDATE) {
             $this->form->update();
@@ -161,7 +161,7 @@ class LaporanSeranganTable extends Component
         }
 
         $this->closeModal('modal-form-search-tanaman');
-        $this->reset('selectedTanaman', 'selectedPenyebab');
+        $this->reset('selectedTanaman');
     }
 
     public function delete($id)

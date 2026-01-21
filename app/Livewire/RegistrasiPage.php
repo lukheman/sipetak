@@ -2,10 +2,9 @@
 
 namespace App\Livewire;
 
-use App\Enums\Role;
 use App\Models\Desa;
 use App\Models\Kecamatan;
-use App\Models\User;
+use App\Models\Petani;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Rule;
 use Livewire\Attributes\Validate;
@@ -17,15 +16,14 @@ class RegistrasiPage extends Component
     #[Validate('required|string|max:255')]
     public $nama;
 
-    #[Validate('required|email|max:255|unique:users,email', message: 'Email wajib diisi, harus valid, dan belum terdaftar.')]
+    #[Validate('required|email|max:255|unique:petani,email', message: 'Email wajib diisi, harus valid, dan belum terdaftar.')]
     public $email;
 
-    #[Validate('required|string|regex:/^0[0-9]{9,14}$/|unique:users,telepon')]
+    #[Validate('required|string|regex:/^0[0-9]{9,14}$/|unique:petani,telepon')]
     public $telepon;
 
     #[Validate('nullable|string', message: 'Alamat wajib di isi')]
     public $alamat;
-
 
     #[Rule('required|string|min:4|confirmed')]
     public $password;
@@ -49,7 +47,6 @@ class RegistrasiPage extends Component
 
     public function messages(): array
     {
-
         return [
             'nama.required' => 'Nama wajib diisi dan maksimal 255 karakter.',
             'nama.string' => 'Nama wajib diisi dan maksimal 255 karakter.',
@@ -71,21 +68,18 @@ class RegistrasiPage extends Component
     public function updatedKecamatan($value)
     {
         $this->desaList = $value ? Desa::where('id_kecamatan', $value)->get() : collect();
-
-
     }
 
     public function register()
     {
         $this->validate();
 
-        User::query()->create([
+        Petani::query()->create([
             'nama' => $this->nama,
             'email' => $this->email,
             'password' => bcrypt($this->password),
             'telepon' => $this->telepon,
             'id_desa' => $this->desa,
-            'role' => Role::PETANI->value,
         ]);
 
         flash('Registrasi berhasil! Silakan login.');

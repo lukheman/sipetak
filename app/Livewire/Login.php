@@ -18,6 +18,11 @@ class Login extends Component
 
     public ?string $redirect = null;
 
+    /**
+     * List of guards to attempt authentication against.
+     */
+    protected array $guards = ['petani', 'penyuluh', 'admin', 'kepala_dinas'];
+
     public function messages(): array
     {
         return [
@@ -36,13 +41,16 @@ class Login extends Component
     {
         $credentials = $this->validate();
 
-        if (Auth::attempt($credentials, true)) {
-            // regenerate session agar tidak session fixation
-            request()->session()->regenerate();
+        // Try to authenticate against each guard
+        foreach ($this->guards as $guard) {
+            if (Auth::guard($guard)->attempt($credentials, true)) {
+                // regenerate session agar tidak session fixation
+                request()->session()->regenerate();
 
-            flash('Berhasil login.');
+                flash('Berhasil login.');
 
-            return redirect()->intended($this->redirect ?? route('dashboard'));
+                return redirect()->intended($this->redirect ?? route('dashboard'));
+            }
         }
 
         return flash('Email atau password tidak valid.', 'danger');

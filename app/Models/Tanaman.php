@@ -11,7 +11,13 @@ class Tanaman extends Model
     protected $table = 'tanaman';
     protected $guarded = [];
 
-    public function laporanSerangan() {
+    public function laporanSerangan()
+    {
         return $this->hasMany(LaporanSerangan::class, 'id_tanaman');
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'id_admin', 'id_admin');
     }
 }

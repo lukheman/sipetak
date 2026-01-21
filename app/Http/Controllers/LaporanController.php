@@ -3,30 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\LaporanSerangan;
-use App\Models\User;
+use App\Models\Petani;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class LaporanController extends Controller
 {
     public function laporanPetani()
     {
-
-        $users = User::all();
+        $users = Petani::all();
         $pdf = Pdf::loadView('invoices.laporan-petani', ['users' => $users, 'label' => 'Petani', 'pdf' => true]);
 
-        return $pdf->download('laporan_data_petani_'.date('d_m_Y').'.pdf');
-
+        return $pdf->download('laporan_data_petani_' . date('d_m_Y') . '.pdf');
     }
 
-    public function laporanSeranganSatu($id_laporan) {
-        $laporan = LaporanSerangan::query()->with('tanaman', 'user', 'penanganan', 'penyebabSerangan')->find($id_laporan);
+    public function laporanSeranganSatu($id_laporan)
+    {
+        $laporan = LaporanSerangan::query()->with('tanaman', 'petani', 'penanganan')->find($id_laporan);
 
         $pdf = Pdf::loadView('invoices.laporan-serangan-satu', ['laporan' => $laporan]);
 
-        return $pdf->download('laporan_serangan_tanamanan_'.date('d_m_Y').'.pdf');
-
+        return $pdf->download('laporan_serangan_tanamanan_' . date('d_m_Y') . '.pdf');
     }
-
 }

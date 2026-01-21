@@ -7,12 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Penanganan extends Model
 {
 
-    protected $table = 'penanganan';
+    protected $table = 'rekomendasi_penanganan';
     protected $guarded = [];
 
-    public function user()
+    public function penyuluh()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(Penyuluh::class, 'id_penyuluh', 'id_penyuluh');
     }
 
     public function laporanSerangan()

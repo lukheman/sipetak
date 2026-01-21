@@ -2,22 +2,16 @@
 
 namespace App\Livewire\Dashboard;
 
-use App\Enums\Role;
-use App\Models\Petugas;
-use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Petani;
 use Livewire\Component;
 
 class PetugasDashboard extends Component
 {
-
     public $kecamatan;
 
-    public function getJumlahPetani(): int {
-
-        $user = User::query()->where('role', Role::PETANI)->count();
-        return $user;
-
+    public function getJumlahPetani(): int
+    {
+        return Petani::query()->count();
     }
 
     public function render()

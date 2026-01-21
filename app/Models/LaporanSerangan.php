@@ -25,19 +25,14 @@ class LaporanSerangan extends Model
         return $this->belongsTo(Tanaman::class, 'id_tanaman');
     }
 
-    public function user()
+    public function petani()
     {
-        return $this->belongsTo(User::class, 'id_user');
+        return $this->belongsTo(Petani::class, 'id_petani', 'id_petani');
     }
 
     public function penanganan()
     {
         return $this->hasOne(Penanganan::class, 'id_laporan_serangan');
-    }
-
-    public function penyebabSerangan()
-    {
-        return $this->belongsToMany(PenyebabSerangan::class, 'detail_laporan_serangan', 'id_laporan_serangan', 'id_penyebab_serangan');
     }
 
     public function kepalaDinas()

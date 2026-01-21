@@ -9,13 +9,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class Petani extends Authenticatable
+class Penyuluh extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $table = 'petani';
+    protected $table = 'penyuluh';
 
-    protected $primaryKey = 'id_petani';
+    protected $primaryKey = 'id_penyuluh';
 
     protected $guarded = [];
 
@@ -36,19 +36,19 @@ class Petani extends Authenticatable
      */
     public function getRoleAttribute(): Role
     {
-        return Role::PETANI;
+        return Role::PENYULUH;
     }
 
     /**
-     * Get the laporan serangan for this petani.
+     * Get the penanganan by this penyuluh.
      */
-    public function laporanSerangan(): HasMany
+    public function penanganan(): HasMany
     {
-        return $this->hasMany(LaporanSerangan::class, 'id_petani', 'id_petani');
+        return $this->hasMany(Penanganan::class, 'id_penyuluh', 'id_penyuluh');
     }
 
     /**
-     * Get the desa for this petani.
+     * Get the desa for this penyuluh.
      */
     public function desa(): BelongsTo
     {

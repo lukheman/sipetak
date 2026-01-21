@@ -33,5 +33,15 @@ class Admin extends Authenticatable
     {
         return $this->hasMany(Penanganan::class, 'id_admin', 'id_admin');
     }
+
+    public function penyebabSerangan()
+    {
+        return $this->hasMany(PenyebabSerangan::class, 'id_admin', 'id_admin');
+    }
+
+    public function tanaman()
+    {
+        return $this->hasMany(Tanaman::class, 'id_admin', 'id_admin');
+    }
 }
 

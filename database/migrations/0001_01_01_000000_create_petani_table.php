@@ -1,24 +1,21 @@
 <?php
 
-use App\Enums\Role;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
+        Schema::create('petani', function (Blueprint $table) {
+            $table->id('id_petani');
             $table->string('nama');
             $table->string('email')->unique();
             $table->string('password');
             $table->string('telepon');
-            $table->enum('role', Role::values())->default(Role::PETANI);
             $table->foreignId('id_desa')->constrained('desa', 'id_desa')->cascadeOnDelete();
             $table->string('photo')->nullable();
             $table->rememberToken();
@@ -33,7 +30,6 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
-
     }
 
     /**
@@ -41,6 +37,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('sessions');
+        Schema::dropIfExists('petani');
     }
 };

@@ -1,12 +1,7 @@
 <?php
 
-use App\Models\Admin;
 use App\Models\Desa;
 use App\Models\Kecamatan;
-use App\Models\KepalaDinas;
-use App\Models\User;
-use App\Models\Petugas;
-use App\Models\Tanaman;
 use Database\Seeders\PenyebabSeranganSeeder;
 use Database\Seeders\TanamanSeeder;
 use Database\Seeders\UserSeeder;
@@ -16,7 +11,6 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-
         // Data kecamatan dan desa
         $wilayah = [
             ['Baula', ['Baula', 'Longori', 'Pewutaa', 'Puubenua', 'Puubunga', 'Puulemo', 'Puundoho', 'Puuroda', 'Ulu Baula', 'Watalara']],
@@ -52,29 +46,5 @@ class DatabaseSeeder extends Seeder
             PenyebabSeranganSeeder::class,
             TanamanSeeder::class
         ]);
-
-        // Ambil daftar desa secara acak untuk dipakai user
-        // $desaIds = $desaList->pluck('id_desa');
-
-        // User::factory(30)
-        //     ->state(function () use ($desaIds) {
-        //         return [
-        //             'id_desa' => $desaIds->random(),
-        //         ];
-        //     })
-        //     ->create();
-
-        // Tanaman::factory(10)->create();
-
-        // buat User
-
-
-        // User::query()->create([
-        //     'nama_kepala_dinas' => 'Kepala Dinas Kolaka',
-        //     'email' => 'kepaladinas@gmail.com',
-        //     'telepon' => '08225002210021',
-        //     'tanggal_lahir' => fake()->date()
-        // ]);
-
     }
 }

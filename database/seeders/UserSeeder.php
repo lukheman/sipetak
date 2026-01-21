@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Enums\Role;
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Admin;
+use App\Models\KepalaDinas;
+use App\Models\Petani;
+use App\Models\Penyuluh;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -15,57 +16,46 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         // Admin
-
-        User::query()->create([
-            'nama' => 'Admin',
+        Admin::query()->create([
+            'nama_admin' => 'Admin',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('password123'),
-            'telepon' => '081234567890',
-            'role' => Role::ADMIN,
-            'id_desa' => 1,
         ]);
 
         // Kepala Dinas
-        User::query()->create([
-            'nama' => 'Kepala Dinas',
+        KepalaDinas::query()->create([
+            'nama_kepala_dinas' => 'Kepala Dinas',
             'email' => 'kepaladinas@gmail.com',
             'password' => bcrypt('password123'),
             'telepon' => '10010101',
-            'role' => Role::KEPALADINAS,
-            'id_desa' => 1,
+            'tanggal_lahir' => '1980-01-01',
         ]);
 
         // Penyuluh
-        User::query()->create([
+        Penyuluh::query()->create([
             'nama' => 'Penyuluh',
             'email' => 'penyuluh@gmail.com',
             'password' => bcrypt('password123'),
             'telepon' => '10010101001',
-            'role' => Role::PENYULUH,
             'id_desa' => 1,
         ]);
 
-        // Petani
-        User::query()->create([
+        // Petani 1
+        Petani::query()->create([
             'nama' => 'Petani 1',
             'email' => 'petani1@gmail.com',
             'password' => bcrypt('password123'),
             'telepon' => '10010101001',
-            'role' => Role::PETANI,
             'id_desa' => 1,
         ]);
 
-        // Petani
-        User::query()->create([
+        // Petani 2
+        Petani::query()->create([
             'nama' => 'Petani 2',
             'email' => 'petani2@gmail.com',
             'password' => bcrypt('password123'),
             'telepon' => '08100101001',
-            'role' => Role::PETANI,
             'id_desa' => 1,
         ]);
-
-
-
     }
 }
