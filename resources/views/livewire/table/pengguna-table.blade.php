@@ -1,5 +1,14 @@
 @php
     use App\Enums\State;
+
+    $typeLabels = [
+        'petani' => 'Petani',
+        'penyuluh' => 'Penyuluh',
+        'admin' => 'Admin',
+        'kepala_dinas' => 'Kepala Dinas',
+    ];
+
+    $currentLabel = $typeLabels[$userType] ?? 'Pengguna';
 @endphp
 
 <div>
@@ -10,11 +19,11 @@
                 <div class="modal-header bg-primary text-white">
                     <h5 class="modal-title text-white">
                         @if ($currentState === State::CREATE)
-                            Tambah {{ $userType === 'penyuluh' ? 'Penyuluh' : 'Petani' }}
+                            Tambah {{ $currentLabel }}
                         @elseif ($currentState === State::UPDATE)
-                            Perbarui {{ $userType === 'penyuluh' ? 'Penyuluh' : 'Petani' }}
+                            Perbarui {{ $currentLabel }}
                         @elseif ($currentState === State::SHOW)
-                            Detail {{ $userType === 'penyuluh' ? 'Penyuluh' : 'Petani' }}
+                            Detail {{ $currentLabel }}
                         @endif
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -23,10 +32,12 @@
                 <div class="modal-body">
 
                     @isset($form->photo)
-                        <div class="text-center mb-3">
-                            <img class="img-md rounded-circle" src="{{ is_string($form->photo) ? asset('storage/' . $form->photo) : $form->photo->temporaryUrl() }}"
-                                alt="Preview Foto" width="150" height="150">
-                        </div>
+                        @if(is_string($form->photo) && $form->photo)
+                            <div class="text-center mb-3">
+                                <img class="img-md rounded-circle" src="{{ asset('storage/' . $form->photo) }}"
+                                    alt="Preview Foto" width="150" height="150">
+                            </div>
+                        @endif
                     @endisset
 
                     <form>
@@ -46,6 +57,8 @@
                             @error('form.email') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
 
+                        {{-- Telepon - only for petani, penyuluh, kepala_dinas --}}
+                        @if (in_array($userType, ['petani', 'penyuluh', 'kepala_dinas']))
                         <div class="mb-3">
                             <label for="telepon" class="form-label">Telepon</label>
                             <input wire:model="form.telepon" type="text" class="form-control" id="telepon"
@@ -53,6 +66,17 @@
                                 @if ($currentState === State::SHOW) disabled @endif>
                             @error('form.telepon') <small class="text-danger">{{ $message }}</small> @enderror
                         </div>
+                        @endif
+
+                        {{-- Tanggal Lahir - only for kepala_dinas --}}
+                        @if ($userType === 'kepala_dinas')
+                        <div class="mb-3">
+                            <label for="tanggal_lahir" class="form-label">Tanggal Lahir</label>
+                            <input wire:model="form.tanggal_lahir" type="date" class="form-control" id="tanggal_lahir"
+                                @if ($currentState === State::SHOW) disabled @endif>
+                            @error('form.tanggal_lahir') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+                        @endif
 
                         @if ($currentState !== State::SHOW)
                         <div class="mb-3">
@@ -63,6 +87,8 @@
                         </div>
                         @endif
 
+                        {{-- Kecamatan & Desa - only for petani and penyuluh --}}
+                        @if (in_array($userType, ['petani', 'penyuluh']))
                         <div class="row">
                             <div class="col-6">
                                 <!-- Kecamatan -->
@@ -94,6 +120,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endif
                     </form>
                 </div>
 
@@ -127,6 +154,16 @@
                         <i class="mdi mdi-account-tie me-1"></i> Penyuluh
                     </button>
                 </li>
+                <li class="nav-item">
+                    <button class="nav-link {{ $userType === 'admin' ? 'active' : '' }}" wire:click="setUserType('admin')">
+                        <i class="mdi mdi-shield-account me-1"></i> Admin
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link {{ $userType === 'kepala_dinas' ? 'active' : '' }}" wire:click="setUserType('kepala_dinas')">
+                        <i class="mdi mdi-account-star me-1"></i> Kepala Dinas
+                    </button>
+                </li>
             </ul>
 
             <div class="table-responsive">
@@ -135,17 +172,35 @@
                         <tr>
                             <th>Nama</th>
                             <th>Email</th>
+                            @if (in_array($userType, ['petani', 'penyuluh', 'kepala_dinas']))
                             <th>Telepon</th>
+                            @endif
                             <th>Foto</th>
                             <th class="text-end">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($this->users as $item)
+                            @php
+                                $itemName = match($userType) {
+                                    'admin' => $item->nama_admin,
+                                    'kepala_dinas' => $item->nama_kepala_dinas,
+                                    default => $item->nama,
+                                };
+
+                                $itemId = match($userType) {
+                                    'penyuluh' => $item->id_penyuluh,
+                                    'admin' => $item->id_admin,
+                                    'kepala_dinas' => $item->id_kepala_dinas,
+                                    default => $item->id_petani,
+                                };
+                            @endphp
                             <tr>
-                                <td>{{ $item->nama }}</td>
+                                <td>{{ $itemName }}</td>
                                 <td>{{ $item->email }}</td>
-                                <td>{{ $item->telepon }}</td>
+                                @if (in_array($userType, ['petani', 'penyuluh', 'kepala_dinas']))
+                                <td>{{ $item->telepon ?? '-' }}</td>
+                                @endif
                                 <td>
                                     @if ($item->photo)
                                         <img src="{{ asset('storage/' . $item->photo) }}" alt="Foto Pengguna"
@@ -155,13 +210,13 @@
                                     @endif
                                 </td>
                                 <td class="text-end">
-                                    <x-datatable.actions :id="$userType === 'penyuluh' ? $item->id_penyuluh : $item->id_petani" />
+                                    <x-datatable.actions :id="$itemId" />
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-3">
-                                    Tidak ada data {{ $userType === 'penyuluh' ? 'penyuluh' : 'petani' }}.
+                                <td colspan="{{ in_array($userType, ['petani', 'penyuluh', 'kepala_dinas']) ? '5' : '4' }}" class="text-center text-muted py-3">
+                                    Tidak ada data {{ $currentLabel }}.
                                 </td>
                             </tr>
                         @endforelse

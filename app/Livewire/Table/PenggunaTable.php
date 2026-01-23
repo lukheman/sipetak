@@ -4,8 +4,10 @@ namespace App\Livewire\Table;
 
 use App\Enums\State;
 use App\Livewire\Forms\UserForm;
+use App\Models\Admin;
 use App\Models\Desa;
 use App\Models\Kecamatan;
+use App\Models\KepalaDinas;
 use App\Models\Petani;
 use App\Models\Penyuluh;
 use App\Traits\WithModal;
@@ -31,13 +33,23 @@ class PenggunaTable extends Component
 
     public string $search = '';
 
-    public string $userType = 'petani'; // 'petani' or 'penyuluh'
+    public string $userType = 'petani'; // 'petani', 'penyuluh', 'admin', 'kepala_dinas'
 
     public $kecamatanList;
     public $desaList;
     public $selectedDesa;
     public $selectedKecamatan;
     public $kecamatan;
+
+    /**
+     * Get user type labels for display
+     */
+    public array $userTypeLabels = [
+        'petani' => 'Petani',
+        'penyuluh' => 'Penyuluh',
+        'admin' => 'Admin',
+        'kepala_dinas' => 'Kepala Dinas',
+    ];
 
     public function mount()
     {
@@ -50,16 +62,67 @@ class PenggunaTable extends Component
         $this->desaList = $value ? Desa::where('id_kecamatan', $value)->get() : collect();
     }
 
+    /**
+     * Get the model class based on user type
+     */
+    protected function getModelClass(): string
+    {
+        return match ($this->userType) {
+            'penyuluh' => Penyuluh::class,
+            'admin' => Admin::class,
+            'kepala_dinas' => KepalaDinas::class,
+            default => Petani::class,
+        };
+    }
+
+    /**
+     * Get the primary key name based on user type
+     */
+    protected function getPrimaryKeyName(): string
+    {
+        return match ($this->userType) {
+            'penyuluh' => 'id_penyuluh',
+            'admin' => 'id_admin',
+            'kepala_dinas' => 'id_kepala_dinas',
+            default => 'id_petani',
+        };
+    }
+
+    /**
+     * Get the name field based on user type
+     */
+    protected function getNameField(): string
+    {
+        return match ($this->userType) {
+            'admin' => 'nama_admin',
+            'kepala_dinas' => 'nama_kepala_dinas',
+            default => 'nama',
+        };
+    }
+
+    /**
+     * Check if current user type requires desa (location)
+     */
+    public function requiresDesa(): bool
+    {
+        return in_array($this->userType, ['petani', 'penyuluh']);
+    }
+
     #[Computed]
     public function users()
     {
-        $model = $this->userType === 'penyuluh' ? Penyuluh::class : Petani::class;
+        $model = $this->getModelClass();
+        $nameField = $this->getNameField();
 
         return $model::query()
-            ->when($this->search, function ($query) {
-                $query->where('nama', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%')
-                    ->orWhere('telepon', 'like', '%' . $this->search . '%');
+            ->when($this->search, function ($query) use ($nameField) {
+                $query->where($nameField, 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%');
+
+                // Only add telepon search for models that have it
+                if (in_array($this->userType, ['petani', 'penyuluh', 'kepala_dinas'])) {
+                    $query->orWhere('telepon', 'like', '%' . $this->search . '%');
+                }
             })
             ->latest()
             ->paginate(10);
@@ -81,15 +144,17 @@ class PenggunaTable extends Component
 
     public function detail($id)
     {
-        $model = $this->userType === 'penyuluh' ? Penyuluh::class : Petani::class;
+        $model = $this->getModelClass();
         $user = $model::query()->find($id);
 
-        $this->kecamatan = $user->desa->id_kecamatan ?? null;
-        $this->selectedDesa = $user->desa->nama ?? null;
-        $this->selectedKecamatan = $user->desa?->kecamatan?->nama ?? null;
+        if ($this->requiresDesa() && $user->desa) {
+            $this->kecamatan = $user->desa->id_kecamatan ?? null;
+            $this->selectedDesa = $user->desa->nama ?? null;
+            $this->selectedKecamatan = $user->desa?->kecamatan?->nama ?? null;
+            $this->updatedKecamatan($this->kecamatan);
+        }
 
         $this->form->fillFromModel($user, $this->userType);
-        $this->updatedKecamatan($this->kecamatan);
 
         $this->currentState = State::SHOW;
         $this->openModal($this->idModal);
@@ -116,7 +181,7 @@ class PenggunaTable extends Component
 
     public function delete($id)
     {
-        $model = $this->userType === 'penyuluh' ? Penyuluh::class : Petani::class;
+        $model = $this->getModelClass();
         $this->form->user = $model::query()->find($id);
         $this->form->userType = $this->userType;
         $this->dispatch('deleteConfirmation', message: 'Yakin untuk menghapus pengguna ini?');

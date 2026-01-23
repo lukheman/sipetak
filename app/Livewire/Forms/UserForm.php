@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\Admin;
+use App\Models\KepalaDinas;
 use App\Models\Petani;
 use App\Models\Penyuluh;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +15,7 @@ class UserForm extends Form
 {
     public $user;
 
-    public string $userType = 'petani'; // 'petani' or 'penyuluh'
+    public string $userType = 'petani'; // 'petani', 'penyuluh', 'admin', 'kepala_dinas'
 
     public string $nama = '';
 
@@ -25,13 +27,51 @@ class UserForm extends Form
 
     public ?int $id_desa = null;
 
+    public ?string $tanggal_lahir = null;
+
     public $photo;
+
+    /**
+     * Get table and primary key info based on user type
+     */
+    protected function getTableInfo(): array
+    {
+        return match ($this->userType) {
+            'penyuluh' => ['table' => 'penyuluh', 'primaryKey' => 'id_penyuluh', 'nameField' => 'nama'],
+            'admin' => ['table' => 'admin', 'primaryKey' => 'id_admin', 'nameField' => 'nama_admin'],
+            'kepala_dinas' => ['table' => 'kepala_dinas', 'primaryKey' => 'id_kepala_dinas', 'nameField' => 'nama_kepala_dinas'],
+            default => ['table' => 'petani', 'primaryKey' => 'id_petani', 'nameField' => 'nama'],
+        };
+    }
+
+    /**
+     * Check if current user type requires desa
+     */
+    protected function requiresDesa(): bool
+    {
+        return in_array($this->userType, ['petani', 'penyuluh']);
+    }
+
+    /**
+     * Check if current user type requires telepon
+     */
+    protected function requiresTelepon(): bool
+    {
+        return in_array($this->userType, ['petani', 'penyuluh', 'kepala_dinas']);
+    }
+
+    /**
+     * Check if current user type requires tanggal_lahir
+     */
+    protected function requiresTanggalLahir(): bool
+    {
+        return $this->userType === 'kepala_dinas';
+    }
 
     protected function rules(): array
     {
-        $table = $this->userType === 'penyuluh' ? 'penyuluh' : 'petani';
-        $primaryKey = $this->userType === 'penyuluh' ? 'id_penyuluh' : 'id_petani';
-        $ignoreId = $this->user ? $this->user->$primaryKey : null;
+        $info = $this->getTableInfo();
+        $ignoreId = $this->user ? $this->user->{$info['primaryKey']} : null;
 
         $rules = [
             'nama' => 'required|string|max:255',
@@ -39,18 +79,31 @@ class UserForm extends Form
                 'required',
                 'email',
                 'max:255',
-                Rule::unique($table, 'email')->ignore($ignoreId, $primaryKey),
+                Rule::unique($info['table'], 'email')->ignore($ignoreId, $info['primaryKey']),
             ],
             'password' => ['nullable', 'string', 'min:4'],
-            'telepon' => [
+        ];
+
+        // Telepon validation for types that require it
+        if ($this->requiresTelepon()) {
+            $rules['telepon'] = [
                 'required',
                 'regex:/^0[0-9]{9,14}$/',
                 'numeric'
-            ],
-            'id_desa' => 'required|exists:desa,id_desa',
-        ];
+            ];
+        }
 
-        // Validasi file hanya jika upload baru
+        // Desa validation for types that require it
+        if ($this->requiresDesa()) {
+            $rules['id_desa'] = 'required|exists:desa,id_desa';
+        }
+
+        // Tanggal lahir validation for kepala dinas
+        if ($this->requiresTanggalLahir()) {
+            $rules['tanggal_lahir'] = 'required|date';
+        }
+
+        // Photo validation
         if ($this->photo instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile) {
             $rules['photo'] = ['nullable', 'image', 'max:2048'];
         }
@@ -61,11 +114,11 @@ class UserForm extends Form
     public function messages(): array
     {
         return [
-            'nama.required' => 'Mohon masukkan nama Anda (maksimal 255 karakter).',
+            'nama.required' => 'Mohon masukkan nama (maksimal 255 karakter).',
             'nama.string' => 'Nama hanya boleh berisi huruf atau karakter yang valid.',
             'nama.max' => 'Nama maksimal 255 karakter.',
 
-            'email.required' => 'Mohon masukkan email Anda.',
+            'email.required' => 'Mohon masukkan email.',
             'email.email' => 'Mohon masukkan email yang valid.',
             'email.max' => 'Email maksimal 255 karakter.',
             'email.unique' => 'Email telah terdaftar.',
@@ -74,12 +127,15 @@ class UserForm extends Form
             'password.string' => 'Kata sandi hanya boleh berisi huruf atau karakter yang valid.',
             'password.min' => 'Kata sandi minimal 4 karakter.',
 
-            'telepon.required' => 'Mohon masukkan nomor telepon Anda.',
+            'telepon.required' => 'Mohon masukkan nomor telepon.',
             'telepon.regex' => 'Nomor telepon harus format Indonesia, diawali 0, dan panjang 10–15 digit.',
             'telepon.numeric' => 'Nomor telepon hanya boleh berisi angka',
 
             'id_desa.required' => 'Silakan pilih desa.',
             'id_desa.exists' => 'Desa yang dipilih tidak tersedia di sistem.',
+
+            'tanggal_lahir.required' => 'Mohon masukkan tanggal lahir.',
+            'tanggal_lahir.date' => 'Format tanggal tidak valid.',
 
             'photo.image' => 'File yang diunggah harus berupa gambar (jpeg, png, bmp, gif, svg, atau webp).',
             'photo.max' => 'Ukuran gambar maksimal 2MB.',
@@ -89,20 +145,34 @@ class UserForm extends Form
     public function store()
     {
         $validated = $this->validate();
+        $info = $this->getTableInfo();
 
         $data = [
-            'nama' => $validated['nama'],
+            $info['nameField'] => $validated['nama'],
             'email' => $validated['email'],
             'password' => bcrypt($validated['password']),
-            'telepon' => $validated['telepon'],
-            'id_desa' => $validated['id_desa'],
         ];
 
-        if ($this->userType === 'penyuluh') {
-            Penyuluh::query()->create($data);
-        } else {
-            Petani::query()->create($data);
+        if ($this->requiresTelepon()) {
+            $data['telepon'] = $validated['telepon'];
         }
+
+        if ($this->requiresDesa()) {
+            $data['id_desa'] = $validated['id_desa'];
+        }
+
+        if ($this->requiresTanggalLahir()) {
+            $data['tanggal_lahir'] = $validated['tanggal_lahir'];
+        }
+
+        $model = match ($this->userType) {
+            'penyuluh' => Penyuluh::class,
+            'admin' => Admin::class,
+            'kepala_dinas' => KepalaDinas::class,
+            default => Petani::class,
+        };
+
+        $model::query()->create($data);
 
         $this->reset();
     }
@@ -110,13 +180,24 @@ class UserForm extends Form
     public function update()
     {
         $validated = $this->validate();
+        $info = $this->getTableInfo();
 
         $data = [
-            'nama' => $validated['nama'],
+            $info['nameField'] => $validated['nama'],
             'email' => $validated['email'],
-            'telepon' => $validated['telepon'],
-            'id_desa' => $validated['id_desa'],
         ];
+
+        if ($this->requiresTelepon()) {
+            $data['telepon'] = $validated['telepon'];
+        }
+
+        if ($this->requiresDesa()) {
+            $data['id_desa'] = $validated['id_desa'];
+        }
+
+        if ($this->requiresTanggalLahir()) {
+            $data['tanggal_lahir'] = $validated['tanggal_lahir'];
+        }
 
         // Only update password if provided
         if (!empty($validated['password'])) {
@@ -147,10 +228,18 @@ class UserForm extends Form
     {
         $this->user = $user;
         $this->userType = $userType;
-        $this->nama = $user->nama;
-        $this->telepon = $user->telepon;
-        $this->email = $user->email;
-        $this->id_desa = $user->id_desa;
-        $this->photo = $user->photo;
+
+        // Get name based on user type
+        $this->nama = match ($userType) {
+            'admin' => $user->nama_admin ?? '',
+            'kepala_dinas' => $user->nama_kepala_dinas ?? '',
+            default => $user->nama ?? '',
+        };
+
+        $this->email = $user->email ?? '';
+        $this->telepon = $user->telepon ?? '';
+        $this->id_desa = $user->id_desa ?? null;
+        $this->tanggal_lahir = $user->tanggal_lahir ?? null;
+        $this->photo = $user->photo ?? null;
     }
 }
