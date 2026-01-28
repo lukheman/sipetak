@@ -7,67 +7,99 @@
     <!-- Modal Form Penyebab Serangan -->
     <div class="modal fade" id="modal-form-penyebab-serangan" tabindex="-1" wire:ignore.self>
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-            <div class="modal-content">
+            <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title text-white">
+                    <h5 class="modal-title fw-bold" id="penyebabSeranganModalLabel">
                         @if ($currentState === State::CREATE)
-                            Tambah Penyebab Serangan
+                            <i class="mdi mdi-plus-circle-outline me-2"></i>Tambah Penyebab Serangan
                         @elseif ($currentState === State::UPDATE)
-                            Perbarui Penyebab Serangan
+                            <i class="mdi mdi-pencil-outline me-2"></i>Perbarui Penyebab Serangan
                         @elseif ($currentState === State::SHOW)
-                            Detail Penyebab Serangan
+                            <i class="mdi mdi-file-document-outline me-2"></i>Detail Penyebab Serangan
                         @endif
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
-                    <form>
-                        <!-- Nama -->
+                    @if ($currentState === State::SHOW)
+                        <!-- Detail View -->
                         <div class="mb-3">
-                            <label for="nama" class="form-label">Nama Penyebab Serangan</label>
-                            <input wire:model="form.nama" type="text" class="form-control"
-                                   id="nama" placeholder="Masukkan nama penyebab serangan"
-                                   @if ($currentState === State::SHOW) disabled @endif>
-                            @error('form.nama')
-                                <small class="d-block mt-1 text-danger">{{ $message }}</small>
-                            @enderror
+                            <p class="mb-1 text-muted">Nama Penyebab Serangan</p>
+                            <h6>{{ $form->nama }}</h6>
                         </div>
 
-                        <!-- Tipe -->
                         <div class="mb-3">
-                            <label for="tipe" class="form-label">Tipe Penyebab</label>
-                            <select wire:model="form.tipe" class="form-select" id="tipe"
-                                    @if ($currentState === State::SHOW) disabled @endif>
-                                @foreach (PenyebabSerangan::TIPE_OPTIONS as $value => $label)
-                                    <option value="{{ $value }}">{{ $label }}</option>
-                                @endforeach
-                            </select>
-                            @error('form.tipe')
-                                <small class="d-block mt-1 text-danger">{{ $message }}</small>
-                            @enderror
+                            <p class="mb-1 text-muted">Tipe</p>
+                            <span class="badge bg-{{ $form->tipe === 'hama' ? 'warning text-dark' : 'danger' }}">
+                                <i class="mdi mdi-{{ $form->tipe === 'hama' ? 'bug' : 'virus' }} me-1"></i>
+                                {{ ucfirst($form->tipe) }}
+                            </span>
                         </div>
 
-                        <!-- Deskripsi -->
                         <div class="mb-3">
-                            <label for="deskripsi" class="form-label">Deskripsi</label>
-                            <textarea wire:model="form.deskripsi" class="form-control"
-                                      id="deskripsi" rows="6"
-                                      @if ($currentState === State::SHOW) disabled @endif
-    style="height: 150px;"
-    ></textarea>
-                            @error('form.deskripsi')
-                                <small class="d-block mt-1 text-danger">{{ $message }}</small>
-                            @enderror
+                            <p class="mb-1 text-muted">Deskripsi</p>
+                            <div class="border rounded p-3 bg-light">
+                                {{ $form->deskripsi ?? 'Tidak ada deskripsi.' }}
+                            </div>
                         </div>
-                    </form>
+                    @else
+                        <!-- Create/Edit Form -->
+                        <form wire:submit.prevent="save">
+                            <!-- Nama -->
+                            <div class="mb-3">
+                                <label for="nama" class="form-label fw-semibold">Nama Penyebab Serangan</label>
+                                <input wire:model="form.nama" type="text"
+                                    class="form-control @error('form.nama') is-invalid @enderror" id="nama"
+                                    placeholder="Masukkan nama penyebab serangan">
+                                @error('form.nama')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Tipe -->
+                            <div class="mb-3">
+                                <label for="tipe" class="form-label fw-semibold">Tipe Penyebab</label>
+                                <select wire:model="form.tipe" class="form-select @error('form.tipe') is-invalid @enderror"
+                                    id="tipe">
+                                    <option value="">-- Pilih Tipe --</option>
+                                    @foreach (PenyebabSerangan::TIPE_OPTIONS as $value => $label)
+                                        <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                @error('form.tipe')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <!-- Deskripsi -->
+                            <div class="mb-3">
+                                <label for="deskripsi" class="form-label fw-semibold">Deskripsi</label>
+                                <textarea wire:model="form.deskripsi"
+                                    class="form-control @error('form.deskripsi') is-invalid @enderror" id="deskripsi"
+                                    rows="4" placeholder="Jelaskan tentang penyebab serangan ini..."
+                                    style="height: 150px;"></textarea>
+                                @error('form.deskripsi')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </form>
+                    @endif
                 </div>
 
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="mdi mdi-close me-1"></i>Tutup
+                    </button>
                     @if ($currentState === State::CREATE)
-                        <button type="button" wire:click="save" class="btn btn-primary">Tambahkan</button>
+                        <button type="button" wire:click="save" class="btn btn-primary">
+                            <i class="mdi mdi-content-save-outline me-1"></i>Tambahkan
+                        </button>
                     @elseif ($currentState === State::UPDATE)
-                        <button type="button" wire:click="save" class="btn btn-primary">Perbarui</button>
+                        <button type="button" wire:click="save" class="btn btn-primary">
+                            <i class="mdi mdi-content-save-outline me-1"></i>Perbarui
+                        </button>
                     @endif
                 </div>
             </div>
@@ -85,7 +117,7 @@
             <ul class="nav nav-tabs mb-3">
                 <li class="nav-item">
                     <button wire:click="setActiveTab('all')"
-                            class="nav-link {{ $activeTab === 'all' ? 'active' : '' }}">
+                        class="nav-link {{ $activeTab === 'all' ? 'active' : '' }}">
                         <i class="mdi mdi-view-list me-1"></i>
                         Semua
                         <span class="badge bg-secondary ms-1">{{ $this->countAll }}</span>
@@ -93,7 +125,7 @@
                 </li>
                 <li class="nav-item">
                     <button wire:click="setActiveTab('hama')"
-                            class="nav-link {{ $activeTab === 'hama' ? 'active' : '' }}">
+                        class="nav-link {{ $activeTab === 'hama' ? 'active' : '' }}">
                         <i class="mdi mdi-bug me-1"></i>
                         Hama
                         <span class="badge bg-warning text-dark ms-1">{{ $this->countHama }}</span>
@@ -101,7 +133,7 @@
                 </li>
                 <li class="nav-item">
                     <button wire:click="setActiveTab('penyakit')"
-                            class="nav-link {{ $activeTab === 'penyakit' ? 'active' : '' }}">
+                        class="nav-link {{ $activeTab === 'penyakit' ? 'active' : '' }}">
                         <i class="mdi mdi-virus me-1"></i>
                         Penyakit
                         <span class="badge bg-danger ms-1">{{ $this->countPenyakit }}</span>

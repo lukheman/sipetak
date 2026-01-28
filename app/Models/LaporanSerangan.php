@@ -39,4 +39,14 @@ class LaporanSerangan extends Model
     {
         return $this->belongsTo(KepalaDinas::class, 'id_kepala_dinas', 'id_kepala_dinas');
     }
+
+    public function penyebabSerangan()
+    {
+        return $this->belongsToMany(
+            PenyebabSerangan::class,
+            'detail_laporan_serangan',
+            'id_laporan_serangan',
+            'id_penyebab_serangan'
+        )->withTimestamps();
+    }
 }

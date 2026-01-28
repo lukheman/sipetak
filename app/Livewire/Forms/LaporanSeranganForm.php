@@ -13,6 +13,7 @@ class LaporanSeranganForm extends Form
 
     public string $deskripsi = '';
     public ?Tanaman $tanaman;
+    public array $selectedPenyebabSerangan = [];
 
     public ?string $penanganan;
 
@@ -70,12 +71,17 @@ class LaporanSeranganForm extends Form
     {
         $this->validate();
 
-        LaporanSerangan::query()->create([
+        $laporan = LaporanSerangan::query()->create([
             'id_tanaman' => $this->tanaman->id,
             'id_petani' => getActiveUserId(),
             'tanggal_laporan' => now(),
             'deskripsi' => $this->deskripsi,
         ]);
+
+        // Sync penyebab serangan to pivot table
+        if (!empty($this->selectedPenyebabSerangan)) {
+            $laporan->penyebabSerangan()->sync($this->selectedPenyebabSerangan);
+        }
 
         $this->reset();
     }

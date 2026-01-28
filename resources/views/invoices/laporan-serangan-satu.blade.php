@@ -64,6 +64,49 @@
         </tbody>
     </table>
 
+    <!-- Penyebab Serangan -->
+    @if ($laporan->penyebabSerangan && $laporan->penyebabSerangan->count() > 0)
+        <table style="margin-bottom: 20px;">
+            <thead>
+                <tr>
+                    <th>Penyebab Serangan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @php
+                    $hamaList = $laporan->penyebabSerangan->where('tipe', 'hama');
+                    $penyakitList = $laporan->penyebabSerangan->where('tipe', 'penyakit');
+                @endphp
+
+                @if ($hamaList->count() > 0)
+                    <tr>
+                        <td>
+                            <b>Hama:</b><br>
+                            <ul style="margin: 5px 0; padding-left: 20px;">
+                                @foreach ($hamaList as $hama)
+                                    <li>{{ $hama->nama }}</li>
+                                @endforeach
+                            </ul>
+                        </td>
+                    </tr>
+                @endif
+
+                @if ($penyakitList->count() > 0)
+                    <tr>
+                        <td>
+                            <b>Penyakit:</b><br>
+                            <ul style="margin: 5px 0; padding-left: 20px;">
+                                @foreach ($penyakitList as $penyakit)
+                                    <li>{{ $penyakit->nama }}</li>
+                                @endforeach
+                            </ul>
+                        </td>
+                    </tr>
+                @endif
+            </tbody>
+        </table>
+    @endif
+
     <!-- Penanganan -->
     @if ($laporan->penanganan)
         <table style="margin-bottom: 20px;">

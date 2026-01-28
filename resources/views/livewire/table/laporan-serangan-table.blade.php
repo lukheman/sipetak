@@ -80,6 +80,41 @@
                         </div>
                     </div>
 
+                    <!-- Penyebab Serangan -->
+                    @if ($selectedLaporan->penyebabSerangan && $selectedLaporan->penyebabSerangan->count() > 0)
+                        <div class="mb-3">
+                            <p class="mb-1 text-muted">Penyebab Serangan</p>
+                            <div class="border rounded p-3" style="background-color: rgba(var(--bs-primary-rgb), 0.03); border-color: rgba(var(--bs-primary-rgb), 0.15) !important;">
+                                @php
+                                    $hamaSelected = $selectedLaporan->penyebabSerangan->where('tipe', 'hama');
+                                    $penyakitSelected = $selectedLaporan->penyebabSerangan->where('tipe', 'penyakit');
+                                @endphp
+
+                                @if ($hamaSelected->count() > 0)
+                                    <div class="mb-2">
+                                        <span class="fw-semibold" style="color: var(--bs-primary);"><i class="mdi mdi-bug me-1"></i>Hama:</span>
+                                        <div class="d-flex flex-wrap gap-1 mt-1">
+                                            @foreach ($hamaSelected as $hama)
+                                                <span class="badge bg-warning text-dark">{{ $hama->nama }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
+                                @if ($penyakitSelected->count() > 0)
+                                    <div>
+                                        <span class="fw-semibold" style="color: var(--bs-primary);"><i class="mdi mdi-virus me-1"></i>Penyakit:</span>
+                                        <div class="d-flex flex-wrap gap-1 mt-1">
+                                            @foreach ($penyakitSelected as $penyakit)
+                                                <span class="badge bg-danger">{{ $penyakit->nama }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+
                     @if (getActiveUserRole() === Role::PETANI)
                         <div class="mb-3">
                             <p class="mb-1 text-muted">Penanganan</p>
@@ -188,6 +223,67 @@
         </div>
         <!-- Form laporan serangan -->
         <form wire:submit.prevent="save">
+
+            <!-- Penyebab Serangan -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Penyebab Serangan</label>
+                <div class="border rounded p-3" style="background-color: rgba(var(--bs-primary-rgb), 0.03); border-color: rgba(var(--bs-primary-rgb), 0.15) !important;">
+                    @if($this->hamaList->count() > 0)
+                        <div class="mb-3">
+                            <h6 class="mb-2" style="color: var(--bs-primary); font-weight: 600;"><i class="mdi mdi-bug me-1"></i>Hama</h6>
+                            <div class="row g-2">
+                                @foreach($this->hamaList as $hama)
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="form-check penyebab-check-item p-2 rounded" style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(var(--bs-primary-rgb), 0.1); transition: all 0.2s ease;">
+                                            <input
+                                                type="checkbox"
+                                                class="form-check-input penyebab-checkbox"
+                                                id="hama_{{ $hama->id }}"
+                                                value="{{ $hama->id }}"
+                                                wire:model="form.selectedPenyebabSerangan"
+                                                style="cursor: pointer;"
+                                            >
+                                            <label class="form-check-label w-100" for="hama_{{ $hama->id }}" style="cursor: pointer;">
+                                                {{ $hama->nama }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                    @if($this->penyakitList->count() > 0)
+                        <div>
+                            <h6 class="mb-2" style="color: var(--bs-primary); font-weight: 600;"><i class="mdi mdi-virus me-1"></i>Penyakit</h6>
+                            <div class="row g-2">
+                                @foreach($this->penyakitList as $penyakit)
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="form-check penyebab-check-item p-2 rounded" style="background-color: rgba(255, 255, 255, 0.7); border: 1px solid rgba(var(--bs-primary-rgb), 0.1); transition: all 0.2s ease;">
+                                            <input
+                                                type="checkbox"
+                                                class="form-check-input penyebab-checkbox"
+                                                id="penyakit_{{ $penyakit->id }}"
+                                                value="{{ $penyakit->id }}"
+                                                wire:model="form.selectedPenyebabSerangan"
+                                                style="cursor: pointer;"
+                                            >
+                                            <label class="form-check-label w-100" for="penyakit_{{ $penyakit->id }}" style="cursor: pointer;">
+                                                {{ $penyakit->nama }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                    @if($this->hamaList->count() == 0 && $this->penyakitList->count() == 0)
+                        <p class="text-muted mb-0 text-center">Tidak ada penyebab serangan tersedia.</p>
+                    @endif
+                </div>
+                @error('form.selectedPenyebabSerangan')
+                    <div class="text-danger small mt-1">{{ $message }}</div>
+                @enderror
+            </div>
 
             <div class="mb-3">
                 <label for="deskripsi" class="form-label fw-semibold">Deskripsi Laporan</label>
