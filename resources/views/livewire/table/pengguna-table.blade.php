@@ -138,7 +138,28 @@
     <!-- Card DataTable -->
     <div class="card">
         <div class="card-header">
-            <x-datatable.header icon="mdi-account" table="Pengguna" />
+
+<div class="row">
+    <div class="col-6">
+
+        <x-datatable.search table="Pengguna"></x-datatable.search>
+
+    </div>
+
+    <div class="col-6 text-end">
+        <!-- Tombol Modal Form Petani -->
+    @if ($userType === 'petani' || $userType === 'penyuluh')
+
+        <button wire:click="add" class="btn btn-primary">
+            <i class="mdi mdi-account"></i>
+            Tambah Pengguna
+        </button>
+
+    @endif
+
+    </div>
+
+</div>
         </div>
 
         <div class="card-body">
