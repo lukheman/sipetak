@@ -4,6 +4,7 @@ namespace App\Livewire\Table;
 
 use App\Enums\Role;
 use App\Enums\State;
+use App\Enums\StatusLaporan;
 use App\Livewire\Forms\LaporanSeranganForm;
 use App\Models\LaporanSerangan;
 use App\Models\PenyebabSerangan;
@@ -26,6 +27,7 @@ class LaporanSeranganTable extends Component
     public LaporanSeranganForm $form;
 
     public ?LaporanSerangan $selectedLaporan;
+    public $solusiSerupa = [];
 
     public $currentState = State::CREATE;
     public string $idModal = 'modal-form-laporan-serangan';
@@ -134,11 +136,31 @@ class LaporanSeranganTable extends Component
     public function detail($id)
     {
         $laporan = LaporanSerangan::query()
-            ->with('tanaman')
+            ->with(['tanaman', 'penyebabSerangan', 'penanganan'])
             ->findOrFail($id);
 
         $this->selectedLaporan = $laporan;
         $this->form->fillFromModel($laporan);
+
+        // Cari solusi dari laporan serupa (penyebab serangan yang sama, sudah selesai)
+        $this->solusiSerupa = collect();
+        if (getActiveUserRole() === Role::PETANI) {
+            $penyebabIds = $laporan->penyebabSerangan->pluck('id')->toArray();
+
+            if (!empty($penyebabIds)) {
+                $this->solusiSerupa = LaporanSerangan::query()
+                    ->where('id', '!=', $laporan->id)
+                    ->where('status', StatusLaporan::RESOLVED)
+                    ->whereHas('penanganan')
+                    ->whereHas('penyebabSerangan', function ($q) use ($penyebabIds) {
+                        $q->whereIn('penyebab_serangan.id', $penyebabIds);
+                    })
+                    ->with(['penanganan', 'penyebabSerangan', 'tanaman'])
+                    ->latest()
+                    ->limit(5)
+                    ->get();
+            }
+        }
 
         $this->openModal('modal-detail-laporan-serangan');
         $this->currentState = State::SHOW;

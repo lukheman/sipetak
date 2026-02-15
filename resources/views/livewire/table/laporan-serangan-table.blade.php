@@ -122,6 +122,39 @@
                                 {{ $selectedLaporan->penanganan->isi_penanganan ?? 'Tidak ada keterangan.' }}
                             </div>
                         </div>
+
+                        <!-- Solusi dari Laporan Serupa -->
+                        @if ($solusiSerupa && count($solusiSerupa) > 0)
+                            <div class="mb-3">
+                                <p class="mb-1 text-muted">
+                                    <i class="mdi mdi-lightbulb-on-outline me-1"></i>Solusi dari Laporan Serupa
+                                </p>
+                                <div class="border rounded p-3" style="background-color: rgba(var(--bs-success-rgb), 0.04); border-color: rgba(var(--bs-success-rgb), 0.2) !important;">
+                                    @foreach ($solusiSerupa as $index => $laporanSerupa)
+                                        <div class="mb-3 pb-3 {{ !$loop->last ? 'border-bottom' : '' }}">
+                                            <div class="d-flex align-items-center mb-2">
+                                                <span class="badge bg-success me-2">{{ $index + 1 }}</span>
+                                                <small class="text-muted">
+                                                    <i class="mdi mdi-calendar me-1"></i>{{ $laporanSerupa->created_at->format('d M Y') }}
+                                                    &mdash; Tanaman: <strong>{{ $laporanSerupa->tanaman->nama_tanaman ?? '-' }}</strong>
+                                                </small>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                                @foreach ($laporanSerupa->penyebabSerangan as $penyebab)
+                                                    <span class="badge bg-{{ $penyebab->tipe === 'hama' ? 'warning text-dark' : 'danger' }}">
+                                                        {{ $penyebab->nama }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                            <div class="rounded p-2" style="background-color: rgba(255,255,255,0.7);">
+                                                <small><i class="mdi mdi-sprout me-1 text-success"></i><strong>Penanganan:</strong></small><br>
+                                                <small>{{ $laporanSerupa->penanganan->isi_penanganan }}</small>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     @endif
                 </div>
             </div>
