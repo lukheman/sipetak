@@ -32,6 +32,8 @@ class LaporanSeranganTable extends Component
     public $currentState = State::CREATE;
     public string $idModal = 'modal-form-laporan-serangan';
     public string $search = '';
+    public string $filterStatus = '';
+    public bool $filterBelumDibalas = false;
 
     public string $searchTanaman = '';
 
@@ -113,17 +115,55 @@ class LaporanSeranganTable extends Component
 
 
     #[Computed]
+    public function statusCounts()
+    {
+        $baseQuery = LaporanSerangan::query();
+
+        if (getActiveUserRole() === Role::PETANI) {
+            $baseQuery->where('id_petani', getActiveUserId());
+        }
+
+        $all = $baseQuery->get();
+        $counts = $all->groupBy(fn($item) => $item->status->value)->map->count();
+
+        $belumDibalasQuery = LaporanSerangan::query()->whereDoesntHave('penanganan');
+        if (getActiveUserRole() === Role::PETANI) {
+            $belumDibalasQuery->where('id_petani', getActiveUserId());
+        }
+
+        return [
+            'total' => $all->count(),
+            'belum_dibalas' => $belumDibalasQuery->count(),
+            StatusLaporan::PENDING->value => $counts->get(StatusLaporan::PENDING->value, 0),
+            StatusLaporan::IN_PROGRESS->value => $counts->get(StatusLaporan::IN_PROGRESS->value, 0),
+            StatusLaporan::RESOLVED->value => $counts->get(StatusLaporan::RESOLVED->value, 0),
+            StatusLaporan::REJECTED->value => $counts->get(StatusLaporan::REJECTED->value, 0),
+        ];
+    }
+
+    #[Computed]
     public function laporanSerangan()
     {
         $query = LaporanSerangan::query()
-            ->when($this->search, fn($q) => $q->where('deskripsi', 'like', '%' . $this->search . '%'));
+            ->when($this->search, fn($q) => $q->where('deskripsi', 'like', '%' . $this->search . '%'))
+            ->when($this->filterStatus, fn($q) => $q->where('status', $this->filterStatus))
+            ->when($this->filterBelumDibalas, fn($q) => $q->whereDoesntHave('penanganan'));
 
         if (getActiveUserRole() === Role::PETANI) {
             $query->where('id_petani', getActiveUserId());
         }
 
         return $query->latest()->paginate(10);
+    }
 
+    public function updatedFilterStatus()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedFilterBelumDibalas()
+    {
+        $this->resetPage();
     }
 
     public function add()

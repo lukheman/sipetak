@@ -414,32 +414,92 @@
     </div>
 </div>
 
+<!-- Statistik Status Laporan -->
+@php $counts = $this->statusCounts; @endphp
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center py-3">
+                <div class="text-muted small mb-1"><i class="mdi mdi-file-document-multiple-outline me-1"></i>Total</div>
+                <h4 class="fw-bold mb-0">{{ $counts['total'] }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card border-0 shadow-sm h-100 {{ $filterStatus === StatusLaporan::PENDING->value ? 'border-warning border-2' : '' }}" style="cursor:pointer;" wire:click="$set('filterStatus', '{{ $filterStatus === StatusLaporan::PENDING->value ? '' : StatusLaporan::PENDING->value }}')">
+            <div class="card-body text-center py-3">
+                <div class="text-warning small mb-1"><i class="mdi mdi-clock-outline me-1"></i>Menunggu</div>
+                <h4 class="fw-bold mb-0 text-warning">{{ $counts[StatusLaporan::PENDING->value] }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card border-0 shadow-sm h-100 {{ $filterStatus === StatusLaporan::IN_PROGRESS->value ? 'border-primary border-2' : '' }}" style="cursor:pointer;" wire:click="$set('filterStatus', '{{ $filterStatus === StatusLaporan::IN_PROGRESS->value ? '' : StatusLaporan::IN_PROGRESS->value }}')">
+            <div class="card-body text-center py-3">
+                <div class="text-primary small mb-1"><i class="mdi mdi-progress-clock me-1"></i>Diproses</div>
+                <h4 class="fw-bold mb-0 text-primary">{{ $counts[StatusLaporan::IN_PROGRESS->value] }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card border-0 shadow-sm h-100 {{ $filterStatus === StatusLaporan::RESOLVED->value ? 'border-success border-2' : '' }}" style="cursor:pointer;" wire:click="$set('filterStatus', '{{ $filterStatus === StatusLaporan::RESOLVED->value ? '' : StatusLaporan::RESOLVED->value }}')">
+            <div class="card-body text-center py-3">
+                <div class="text-success small mb-1"><i class="mdi mdi-check-circle-outline me-1"></i>Selesai</div>
+                <h4 class="fw-bold mb-0 text-success">{{ $counts[StatusLaporan::RESOLVED->value] }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card border-0 shadow-sm h-100 {{ $filterStatus === StatusLaporan::REJECTED->value ? 'border-danger border-2' : '' }}" style="cursor:pointer;" wire:click="$set('filterStatus', '{{ $filterStatus === StatusLaporan::REJECTED->value ? '' : StatusLaporan::REJECTED->value }}')">
+            <div class="card-body text-center py-3">
+                <div class="text-danger small mb-1"><i class="mdi mdi-close-circle-outline me-1"></i>Ditolak</div>
+                <h4 class="fw-bold mb-0 text-danger">{{ $counts[StatusLaporan::REJECTED->value] }}</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-4 col-lg-2">
+        <div class="card border-0 shadow-sm h-100 {{ $filterBelumDibalas ? 'border-secondary border-2' : '' }}" style="cursor:pointer;" wire:click="$toggle('filterBelumDibalas')">
+            <div class="card-body text-center py-3">
+                <div class="text-secondary small mb-1"><i class="mdi mdi-message-reply-text-outline me-1"></i>Belum Dibalas</div>
+                <h4 class="fw-bold mb-0 text-secondary">{{ $counts['belum_dibalas'] }}</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Table -->
 <div class="card">
     <div class="card-header">
-<div class="row">
-    <div class="col-6">
+        <div class="row align-items-center g-2">
+            <div class="col-md-4">
+                <x-datatable.search table="Laporan Serangan"></x-datatable.search>
+            </div>
 
-        <x-datatable.search table="Laporan Serangan"></x-datatable.search>
+            <div class="col-md-3">
+                <select wire:model.live="filterStatus" class="form-select form-select-sm">
+                    <option value="">Semua Status</option>
+                    @foreach (StatusLaporan::cases() as $status)
+                        <option value="{{ $status->value }}">{{ $status->getLabel() }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-    </div>
+            <div class="col-md-3 d-flex align-items-center ps-5">
+                <div class="form-check form-switch mb-0">
+                    <input class="form-check-input" type="checkbox" id="filterBelumDibalas" wire:model.live="filterBelumDibalas">
+                    <label class="form-check-label small text-nowrap" for="filterBelumDibalas">Belum Dibalas</label>
+                </div>
+            </div>
 
-    <div class="col-6 text-end">
-
-        @if ($activeRole === Role::PETANI)
-
-        <!-- Tombol -->
-        <button wire:click="add" class="btn btn-primary">
-            <i class="mdi mdi-bug"></i>
-            Tambah Laporan Serangan
-        </button>
-
-        @endif
-
-    </div>
-
-</div>
-
+            <div class="col-md-3 text-end">
+                @if ($activeRole === Role::PETANI)
+                <button wire:click="add" class="btn btn-primary btn-sm">
+                    <i class="mdi mdi-bug"></i>
+                    Tambah Laporan
+                </button>
+                @endif
+            </div>
+        </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">
@@ -450,7 +510,6 @@
                         <th>Deskripsi</th>
                         <th>Status</th>
                         <th class="text-end">Aksi</th>
-
                     </tr>
                 </thead>
                 <tbody>
