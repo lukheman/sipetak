@@ -3,6 +3,7 @@
 namespace App\Livewire\Forms;
 
 use App\Models\Tanaman;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -14,6 +15,7 @@ class TanamanForm extends Form
     public string $nama_tanaman = '';
     public string $deskripsi = '';
     public $gambar;
+    public array $penyebab_serangan_ids = [];
 
     public function rules(): array
     {
@@ -47,6 +49,7 @@ class TanamanForm extends Form
         $this->nama_tanaman = $tanaman->nama_tanaman;
         $this->gambar = $tanaman->gambar;
         $this->deskripsi = $tanaman->deskripsi;
+        $this->penyebab_serangan_ids = $tanaman->penyebabSerangan->pluck('id')->map(fn($id) => (string) $id)->toArray();
     }
 
     /**
@@ -56,13 +59,16 @@ class TanamanForm extends Form
     {
         $tanaman = Tanaman::query()->create($this->validate());
 
-        if ($this->gambar) {
+        if ($this->gambar instanceof UploadedFile) {
             // Store new gambar
             $path = $this->gambar->store('tanaman', 'public');
             $tanaman->update([
                 'gambar' => $path
             ]);
         }
+
+        // Sync penyebab serangan
+        $tanaman->penyebabSerangan()->sync($this->penyebab_serangan_ids);
 
         $this->reset();
     }
@@ -79,7 +85,7 @@ class TanamanForm extends Form
             'deskripsi' => $this->deskripsi,
         ]);
 
-        if ($this->gambar) {
+        if ($this->gambar instanceof UploadedFile) {
 
             // Delete old gambar if exists
             if ($this->tanaman->gambar) {
@@ -92,6 +98,9 @@ class TanamanForm extends Form
                 'gambar' => $path
             ]);
         }
+
+        // Sync penyebab serangan
+        $this->tanaman->penyebabSerangan()->sync($this->penyebab_serangan_ids);
 
         $this->reset();
 

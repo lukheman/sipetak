@@ -95,13 +95,13 @@ class LaporanSeranganTable extends Component
     #[Computed]
     public function hamaList()
     {
-        return PenyebabSerangan::where('tipe', PenyebabSerangan::TIPE_HAMA)->get();
+        return PenyebabSerangan::with('tanaman')->where('tipe', PenyebabSerangan::TIPE_HAMA)->get();
     }
 
     #[Computed]
     public function penyakitList()
     {
-        return PenyebabSerangan::where('tipe', PenyebabSerangan::TIPE_PENYAKIT)->get();
+        return PenyebabSerangan::with('tanaman')->where('tipe', PenyebabSerangan::TIPE_PENYAKIT)->get();
     }
 
     #[Computed]

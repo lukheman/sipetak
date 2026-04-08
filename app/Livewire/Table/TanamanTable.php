@@ -9,6 +9,7 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use App\Models\Tanaman;
+use App\Models\PenyebabSerangan;
 use App\Enums\State;
 use App\Livewire\Forms\TanamanForm;
 use Livewire\WithFileUploads;
@@ -31,13 +32,21 @@ class TanamanTable extends Component
     public string $search = '';
 
     #[Computed]
-    public function tanaman() {
+    public function tanaman()
+    {
         return Tanaman::query()
+            ->with('penyebabSerangan')
             ->when($this->search, function ($query) {
-                $query->where('nama_tanaman', 'like', '%'.$this->search.'%') ;
+                $query->where('nama_tanaman', 'like', '%' . $this->search . '%');
             })
             ->latest()
             ->paginate(10);
+    }
+
+    #[Computed]
+    public function allPenyebabSerangan()
+    {
+        return PenyebabSerangan::orderBy('tipe')->orderBy('nama')->get();
     }
 
     public function add()
@@ -97,7 +106,7 @@ class TanamanTable extends Component
             $this->form->delete();
             $this->notifySuccess('Tanaman berhasil dihapus!');
         } catch (\Exception $e) {
-            $this->notifyError('Gagal menghapus tanaman: '.$e->getMessage());
+            $this->notifyError('Gagal menghapus tanaman: ' . $e->getMessage());
         }
     }
 

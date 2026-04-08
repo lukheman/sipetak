@@ -35,11 +35,22 @@
 
     <!-- Gambar Tanaman -->
     @if ($laporan->tanaman->gambar)
-        <div style="text-align:center; margin-bottom: 20px;">
-            <img src="{{ asset('storage/' . $laporan->tanaman->gambar) }}" alt="Gambar Tanaman"
-                style="max-width: 400px; max-height: 300px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
-            <p style="margin-top: 8px; color:#666; font-size: 10pt;"><i>{{ $laporan->tanaman->nama_tanaman }}</i></p>
-        </div>
+        @php
+            $gambarPath = storage_path('app/public/' . $laporan->tanaman->gambar);
+            $gambarBase64 = '';
+            if (file_exists($gambarPath)) {
+                $gambarType = pathinfo($gambarPath, PATHINFO_EXTENSION);
+                $gambarData = file_get_contents($gambarPath);
+                $gambarBase64 = 'data:image/' . $gambarType . ';base64,' . base64_encode($gambarData);
+            }
+        @endphp
+        @if ($gambarBase64)
+            <div style="text-align:center; margin-bottom: 20px;">
+                <img src="{{ $gambarBase64 }}" alt="Gambar Tanaman"
+                    style="max-width: 400px; max-height: 300px; object-fit: cover; border-radius: 8px; border: 1px solid #ccc;">
+                <p style="margin-top: 8px; color:#666; font-size: 10pt;"><i>{{ $laporan->tanaman->nama_tanaman }}</i></p>
+            </div>
+        @endif
     @endif
 
     <!-- Deskripsi -->

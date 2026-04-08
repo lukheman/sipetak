@@ -20,4 +20,14 @@ class Tanaman extends Model
     {
         return $this->belongsTo(Admin::class, 'id_admin', 'id_admin');
     }
+
+    public function penyebabSerangan()
+    {
+        return $this->belongsToMany(
+            PenyebabSerangan::class,
+            'penyebab_serangan_tanaman',
+            'id_tanaman',
+            'id_penyebab_serangan'
+        )->withTimestamps();
+    }
 }

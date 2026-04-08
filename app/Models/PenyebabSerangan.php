@@ -59,4 +59,14 @@ class PenyebabSerangan extends Model
             'id_laporan_serangan'
         )->withTimestamps();
     }
+
+    public function tanaman()
+    {
+        return $this->belongsToMany(
+            Tanaman::class,
+            'penyebab_serangan_tanaman',
+            'id_penyebab_serangan',
+            'id_tanaman'
+        )->withTimestamps();
+    }
 }
