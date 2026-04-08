@@ -8,6 +8,7 @@ use App\Enums\StatusLaporan;
 use App\Livewire\Forms\LaporanSeranganForm;
 use App\Models\LaporanSerangan;
 use App\Models\PenyebabSerangan;
+use App\Models\PenyebabSeranganTanaman;
 use App\Models\Tanaman;
 use App\Traits\WithModal;
 use App\Traits\WithNotify;
@@ -92,16 +93,26 @@ class LaporanSeranganTable extends Component
         $this->selectedTanaman = null;
     }
 
-    #[Computed]
-    public function hamaList()
-    {
-        return PenyebabSerangan::with('tanaman')->where('tipe', PenyebabSerangan::TIPE_HAMA)->get();
-    }
+#[Computed]
+public function hamaList()
+{
+    return PenyebabSeranganTanaman::with(['tanaman', 'penyebabSerangan'])
+        ->where('id_tanaman', $this->selectedTanaman?->id)
+        ->whereHas('penyebabSerangan', function ($query) {
+            $query->where('tipe', PenyebabSerangan::TIPE_HAMA);
+        })
+        ->get();
+}
 
     #[Computed]
     public function penyakitList()
     {
-        return PenyebabSerangan::with('tanaman')->where('tipe', PenyebabSerangan::TIPE_PENYAKIT)->get();
+    return PenyebabSeranganTanaman::with(['tanaman', 'penyebabSerangan'])
+        ->where('id_tanaman', $this->selectedTanaman?->id)
+        ->whereHas('penyebabSerangan', function ($query) {
+            $query->where('tipe', PenyebabSerangan::TIPE_PENYAKIT);
+        })
+        ->get();
     }
 
     #[Computed]

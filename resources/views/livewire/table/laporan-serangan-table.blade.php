@@ -271,21 +271,14 @@
                                             <input
                                                 type="checkbox"
                                                 class="form-check-input penyebab-checkbox"
-                                                id="hama_{{ $hama->id }}"
-                                                value="{{ $hama->id }}"
+                                                id="hama_{{ $hama->penyebabSerangan->id }}"
+                                                value="{{ $hama->penyebabSerangan->id }}"
                                                 wire:model="form.selectedPenyebabSerangan"
                                                 style="cursor: pointer;"
                                             >
-                                            <label class="form-check-label w-100" for="hama_{{ $hama->id }}" style="cursor: pointer;">
-                                                {{ $hama->nama }}
+                                            <label class="form-check-label w-100" for="hama_{{ $hama->penyebabSerangan->id }}" style="cursor: pointer;">
+                                                {{ $hama->penyebabSerangan->nama }}
                                             </label>
-                                            @if ($hama->tanaman->count() > 0)
-                                                <div class="d-flex flex-wrap gap-1 mt-1">
-                                                    @foreach ($hama->tanaman as $t)
-                                                        <span class="badge bg-success" style="font-size: 0.6rem;"><i class="mdi mdi-leaf"></i> {{ $t->nama_tanaman }}</span>
-                                                    @endforeach
-                                                </div>
-                                            @endif
                                         </div>
                                     </div>
                                 @endforeach
@@ -302,21 +295,14 @@
                                             <input
                                                 type="checkbox"
                                                 class="form-check-input penyebab-checkbox"
-                                                id="penyakit_{{ $penyakit->id }}"
-                                                value="{{ $penyakit->id }}"
+                                                id="penyakit_{{ $penyakit->penyebabSerangan->id }}"
+                                                value="{{ $penyakit->penyebabSerangan->id }}"
                                                 wire:model="form.selectedPenyebabSerangan"
                                                 style="cursor: pointer;"
                                             >
-                                            <label class="form-check-label w-100" for="penyakit_{{ $penyakit->id }}" style="cursor: pointer;">
-                                                {{ $penyakit->nama }}
+                                            <label class="form-check-label w-100" for="penyakit_{{ $penyakit->penyebabSerangan->id }}" style="cursor: pointer;">
+                                                {{ $penyakit->penyebabSerangan->nama }}
                                             </label>
-                                            @if ($penyakit->tanaman->count() > 0)
-                                                <div class="d-flex flex-wrap gap-1 mt-1">
-                                                    @foreach ($penyakit->tanaman as $t)
-                                                        <span class="badge bg-success" style="font-size: 0.6rem;"><i class="mdi mdi-leaf"></i> {{ $t->nama_tanaman }}</span>
-                                                    @endforeach
-                                                </div>
-                                            @endif
                                         </div>
                                     </div>
                                 @endforeach
@@ -326,23 +312,6 @@
                     @if($this->hamaList->count() == 0 && $this->penyakitList->count() == 0)
                         <p class="text-muted mb-0 text-center">Tidak ada penyebab serangan tersedia.</p>
                     @endif
-
-                    {{-- Tanaman yang bisa terserang --}}
-                    @php
-                        $allPenyebab = $this->hamaList->merge($this->penyakitList);
-                        $tanamanMap = collect();
-                        foreach ($allPenyebab as $ps) {
-                            foreach ($ps->tanaman as $t) {
-                                if (!$tanamanMap->has($t->id)) {
-                                    $tanamanMap->put($t->id, [
-                                        'tanaman' => $t,
-                                        'penyebab' => collect(),
-                                    ]);
-                                }
-                                $tanamanMap[$t->id]['penyebab']->push($ps);
-                            }
-                        }
-                    @endphp
 
                 </div>
                 @error('form.selectedPenyebabSerangan')
